@@ -1,0 +1,286 @@
+{
+  "seller": {
+    "name": "Rita Patel",
+    "quota": 500000,
+    "commission_rate": 0.07,
+    "accounts_total": 25,
+    "pipeline_total": 2700000,
+    "contacts_total": 59,
+    "leads_total": 21
+  },
+  "opportunities": [
+    {
+      "id": "opp_greentech",
+      "name": "Greentech — SaaS Expansion",
+      "amount": 60000,
+      "stage": "Proposal",
+      "forecast_category": "Commit",
+      "close_date": "2025-08-25",
+      "champion": "Priya Shah",
+      "champion_status": "active",
+      "last_touchpoint_days": 4,
+      "risk_signals": [],
+      "confidence": 0.78,
+      "notes": "Priya practically closed herself on last call. Said 'just send me the SOW and I'll get it signed this week.'"
+    },
+    {
+      "id": "opp_runners",
+      "name": "Runners Club — Summer Collection",
+      "amount": 720000,
+      "stage": "Closed Won",
+      "forecast_category": "Closed",
+      "close_date": "2025-07-15",
+      "champion": "Lisa Park",
+      "champion_status": "silent",
+      "last_touchpoint_days": 14,
+      "risk_signals": ["Budget objection raised", "CFO joined last call", "Asked about ROI"],
+      "confidence": 0.53,
+      "reopened": true,
+      "notes": "CFO Jordan Hayes joined unexpectedly on March 10. Proposal opened 6x since. Value justification draft ready."
+    },
+    {
+      "id": "opp_sporty",
+      "name": "Sporty Nation — Back to School Promo",
+      "amount": 270000,
+      "stage": "Closed Lost",
+      "forecast_category": "Pipeline",
+      "close_date": "2025-08-10",
+      "champion": "Dana Torres",
+      "champion_status": "silent",
+      "last_touchpoint_days": 14,
+      "risk_signals": ["Champion silent 14 days", "Proposal viewed 14x, no reply"],
+      "confidence": 0.41,
+      "notes": "Company doing layoffs — procurement likely frozen. Vibeface identified 2 alternate stakeholders."
+    },
+    {
+      "id": "opp_acme",
+      "name": "Acme Corp — Enterprise Platform",
+      "amount": 200000,
+      "stage": "Negotiation",
+      "forecast_category": "Best Case",
+      "close_date": "2025-08-20",
+      "champion": "Marcus Lee",
+      "champion_status": "departed",
+      "last_touchpoint_days": 6,
+      "risk_signals": ["Champion departed", "Marcus Lee no longer at Acme", "Commission exposure ~$14K"],
+      "confidence": 0.35,
+      "notes": "Marcus left in last 48 hours. New champions: Priya Shah (via Sarah Chen), Daniel Kim (VP Procurement)."
+    },
+    {
+      "id": "opp_smartfit",
+      "name": "SmartFit — Renewal",
+      "amount": 50000,
+      "stage": "Negotiation",
+      "forecast_category": "Commit",
+      "close_date": "2025-07-30",
+      "champion": "Alex Chen",
+      "champion_status": "active",
+      "last_touchpoint_days": 1,
+      "risk_signals": [],
+      "confidence": 0.82,
+      "autonomous": true,
+      "notes": "Follow-up sequence running. Reply received this morning — positive tone, meeting requested."
+    },
+    {
+      "id": "opp_northwind",
+      "name": "Northwind — Expansion",
+      "amount": 30000,
+      "stage": "Discovery",
+      "forecast_category": "Pipeline",
+      "close_date": "2025-08-15",
+      "champion": "Maria Santos",
+      "champion_status": "active",
+      "last_touchpoint_days": 2,
+      "risk_signals": [],
+      "confidence": 0.65,
+      "autonomous": true,
+      "notes": "Meeting rescheduled to Thursday per champion's request."
+    },
+    {
+      "id": "opp_apex",
+      "name": "Apex Digital — New Lead",
+      "amount": 32000,
+      "stage": "Lead",
+      "forecast_category": "Pipeline",
+      "close_date": "2025-09-15",
+      "champion": null,
+      "champion_status": null,
+      "last_touchpoint_days": 0,
+      "risk_signals": [],
+      "confidence": 0.29,
+      "autonomous": true,
+      "notes": "Data enrichment complete. Warm intro from Sarah. Outreach queued for tomorrow."
+    },
+    {
+      "id": "opp_meridian",
+      "name": "Meridian Health — Platform Migration",
+      "amount": 420000,
+      "stage": "Discovery",
+      "forecast_category": "Pipeline",
+      "close_date": "2025-09-30",
+      "champion": "James Rivera",
+      "champion_status": "active",
+      "last_touchpoint_days": 3,
+      "risk_signals": ["CFO joined last call", "Asked about ROI"],
+      "confidence": 0.58,
+      "notes": "CFO joined last call, asked detailed ROI questions. Value justification deck drafted."
+    },
+    {
+      "id": "opp_pinnacle",
+      "name": "Pinnacle Logistics — Evaluation",
+      "amount": 380000,
+      "stage": "Evaluation",
+      "forecast_category": "Pipeline",
+      "close_date": "2025-09-10",
+      "champion": "Tom Bradley",
+      "champion_status": "active",
+      "last_touchpoint_days": 5,
+      "risk_signals": ["Competitor mentioned", "Also talking to ServiceNow"],
+      "confidence": 0.45,
+      "notes": "\"Also talking to ServiceNow\" in email. Battle card response drafted."
+    },
+    {
+      "id": "opp_techstart",
+      "name": "TechStart — QBR Expansion",
+      "amount": 95000,
+      "stage": "Proposal",
+      "forecast_category": "Commit",
+      "close_date": "2025-07-30",
+      "champion": "Sarah Chen",
+      "champion_status": "active",
+      "last_touchpoint_days": 1,
+      "risk_signals": [],
+      "confidence": 0.78,
+      "meeting": {
+        "date": "today",
+        "time": "2:00 PM",
+        "type": "QBR",
+        "brief_ready": true
+      }
+    },
+    {
+      "id": "opp_nova",
+      "name": "Nova Corp — Upsell",
+      "amount": 40000,
+      "stage": "Discovery",
+      "forecast_category": "Pipeline",
+      "close_date": "2025-09-15",
+      "champion": "VP from conference",
+      "champion_status": "warm",
+      "last_touchpoint_days": 7,
+      "risk_signals": [],
+      "confidence": 0.47,
+      "notes": "Met VP at conference last month. Warm intro package ready."
+    },
+    {
+      "id": "opp_bancroft",
+      "name": "Bancroft Industries — Enterprise RFP",
+      "amount": 150000,
+      "stage": "Lead",
+      "forecast_category": "Pipeline",
+      "close_date": "2025-10-15",
+      "champion": null,
+      "champion_status": null,
+      "last_touchpoint_days": 0,
+      "risk_signals": [],
+      "confidence": 0.18,
+      "notes": "Posted RFP matching solution. No relationship. Parked for Q4. Org chart research in progress."
+    }
+  ],
+  "meetings_today": [
+    {
+      "account": "TechStart",
+      "time": "2:00 PM",
+      "type": "QBR",
+      "opp_id": "opp_techstart",
+      "brief_ready": true
+    },
+    {
+      "account": "Runners Club",
+      "time": "4:00 PM",
+      "type": "Intro Call",
+      "opp_id": "opp_runners",
+      "brief_ready": true
+    }
+  ],
+  "overnight_receipts": {
+    "followups_sent": 4,
+    "meeting_briefs": 1,
+    "crm_updates": 12,
+    "replies": [
+      { "account": "SmartFit", "for": "Greentech", "tone": "positive" }
+    ],
+    "data_points": 12
+  },
+  "focus_block": {
+    "actions_count": 20,
+    "quota_display": "$1.0M",
+    "cards": [
+      {
+        "id": "card_runners",
+        "title": "Budget objection raised",
+        "account": "Runners Club",
+        "deal": "Summer Collection",
+        "amount": 720000,
+        "stage": "Closed Won → reopened",
+        "signal": "CFO joined last call, asked about ROI",
+        "recommendation": "Send value justification deck. Draft ready for review."
+      },
+      {
+        "id": "card_sporty",
+        "title": "Champion silent (14 days)",
+        "account": "Sporty Nation",
+        "deal": "Back to School Promo",
+        "amount": 270000,
+        "stage": "Closed Lost",
+        "signal": "Proposal viewed 14x, no reply",
+        "recommendation": "Find alternate stakeholder."
+      },
+      {
+        "id": "card_pinnacle",
+        "title": "Competitor mentioned",
+        "account": "Pinnacle Logistics",
+        "deal": "Evaluation",
+        "amount": 380000,
+        "stage": "Evaluation",
+        "signal": "\"Also talking to ServiceNow\" in email",
+        "recommendation": "Draft battle card response."
+      }
+    ]
+  },
+  "autonomous_deals": [
+    {
+      "account": "SmartFit",
+      "amount": 50000,
+      "action": "Follow-up sequence running, reply received this morning",
+      "status": "active"
+    },
+    {
+      "account": "Northwind",
+      "amount": 30000,
+      "action": "Meeting rescheduled to Thursday per champion's request",
+      "status": "active"
+    },
+    {
+      "account": "Apex Digital",
+      "amount": 32000,
+      "action": "Data enrichment complete, outreach queued for tomorrow",
+      "status": "active"
+    }
+  ],
+  "follow_ups_overdue": 3,
+  "high_intent_leads": 6,
+  "state": {
+    "on_track": 410000,
+    "needs_you": 90000,
+    "blocked": 0,
+    "days_to_close": 48,
+    "pipeline_value": 1559954,
+    "meetings_per_week": 5,
+    "daily_pace": 17435,
+    "commission_at_quota": 70000,
+    "commission_at_pace": 14000,
+    "quota_pace_pct": 20,
+    "weeks_left": 7
+  }
+}

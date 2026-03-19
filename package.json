@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
     "build": "next build",
+    "build:pages": "next build && rm -rf docs && cp -r out docs && touch docs/.nojekyll",
     "start": "next start",
     "lint": "next lint",
     "heroku-postbuild": "echo \"Build: $(date -u +%Y%m%d%H%M%S)\" > public/build-id.txt && npm run build"

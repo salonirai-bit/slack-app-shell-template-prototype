@@ -12,8 +12,8 @@
 
 # next.js
 /.next/
-/out/  # Build artifacts
-/docs/  # Build output for GitHub Pages - designers don't need this, they can build their own
+/out/  # Build artifacts (local only)
+# /docs/ - NOT ignored: required for GitHub Pages deployment
 
 # production
 /build
