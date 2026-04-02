@@ -150,7 +150,7 @@ export default function Home() {
         <div className="flex-1 min-h-0 bg-[#0f1115] p-3">
           <iframe
             title="Salesforce Go Admin View"
-            src="/pages/saloni-rai/slackagent/salesforce-go/admin-clean.html"
+            src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/salesforce-go/admin-clean.html`}
             className="w-full h-full rounded-xl border border-white/10 bg-white"
           />
         </div>
