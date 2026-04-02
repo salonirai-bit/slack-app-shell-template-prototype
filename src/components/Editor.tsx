@@ -67,9 +67,8 @@ const Editor = ({
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    const editorContainer = container.appendChild(
-      container.ownerDocument.createElement("div")
-    );
+    const editorContainer = container.ownerDocument.createElement("div");
+    container.appendChild(editorContainer);
 
     const options: QuillOptions = {
       theme: "snow",
@@ -127,8 +126,10 @@ const Editor = ({
 
     return () => {
       quill.off(Quill.events.TEXT_CHANGE);
-      if (container) {
-        container.innerHTML = "";
+      // Strict mode + HMR can run mount/unmount cycles quickly and mutate the DOM
+      // between checks. Remove defensively to avoid "node is not a child" errors.
+      if (editorContainer.parentNode === container) {
+        editorContainer.remove();
       }
       if (quillRef.current) {
         quillRef.current = null;

@@ -77,6 +77,7 @@ export interface SlackAppShellProps {
   sidebarOverrideDms?: import('@/context/DemoDataContext').DemoDM[];
   sidebarOverrideChannels?: import('@/context/DemoDataContext').DemoChannel[];
   sidebarApps?: Array<{ id: string; name: string; icon: string }>;
+  topViewMode?: "admin" | "channel-manager" | "seller";
 }
 
 // -----------------------------------------------------------
@@ -100,6 +101,7 @@ export function SlackAppShell({
   sidebarOverrideDms,
   sidebarOverrideChannels,
   sidebarApps,
+  topViewMode = "channel-manager",
 }: SlackAppShellProps) {
   const [isSlackbotOpen, setIsSlackbotOpen] = useState(forceSlackbotOpen);
 
@@ -189,6 +191,7 @@ export function SlackAppShell({
                         overrideDms={sidebarOverrideDms}
                         overrideChannels={sidebarOverrideChannels}
                         sidebarApps={sidebarApps}
+                        topViewMode={topViewMode}
                       />
                       <div
                         className="flex-1 min-w-0 bg-white overflow-hidden pointer-events-auto"
@@ -240,6 +243,7 @@ export function SlackAppShell({
                       overrideDms={sidebarOverrideDms}
                       overrideChannels={sidebarOverrideChannels}
                       sidebarApps={sidebarApps}
+                      topViewMode={topViewMode}
                     />
                     <div
                       className="flex-1 min-w-0 bg-white overflow-hidden pointer-events-auto"

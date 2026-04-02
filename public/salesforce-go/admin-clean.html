@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salesforce Go Admin</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #fff;
+      }
+      #sfgo-frame {
+        border: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe
+      id="sfgo-frame"
+      src="./Salesforce%20Go%20_%20Salesforce.html"
+      title="Salesforce Go"
+    ></iframe>
+    <script>
+      (function () {
+        const frame = document.getElementById("sfgo-frame");
+        const TARGET_TEXT = "sorry to interrupt";
+
+        function removeInterruptModal(doc) {
+          const candidates = doc.querySelectorAll(
+            '[role="dialog"], .slds-modal, .modal-container, .uiModal, .forceModal'
+          );
+          candidates.forEach((el) => {
+            const text = (el.innerText || "").toLowerCase();
+            if (text.includes(TARGET_TEXT)) {
+              el.remove();
+            }
+          });
+
+          const backdrops = doc.querySelectorAll(
+            ".slds-backdrop, .modal-backdrop, .uiModal--mask, .forceModalBackdrop"
+          );
+          backdrops.forEach((el) => el.remove());
+
+          // Defensive cleanup for generic full-screen dim overlays.
+          const all = doc.querySelectorAll("div, section, aside");
+          all.forEach((el) => {
+            const style = doc.defaultView?.getComputedStyle(el);
+            if (!style) return;
+            const isFixed = style.position === "fixed";
+            const coversViewport =
+              style.top === "0px" &&
+              style.left === "0px" &&
+              (style.width === "100%" || style.width === doc.documentElement.clientWidth + "px") &&
+              (style.height === "100%" || style.height === doc.documentElement.clientHeight + "px");
+            const hasDimBackground =
+              style.backgroundColor.includes("rgba") &&
+              !style.backgroundColor.endsWith(", 0)") &&
+              parseFloat(style.opacity || "1") > 0;
+            const highZ = parseInt(style.zIndex || "0", 10) >= 900;
+
+            if (isFixed && coversViewport && highZ && hasDimBackground) {
+              el.remove();
+            }
+          });
+        }
+
+        frame.addEventListener("load", () => {
+          const doc = frame.contentDocument;
+          if (!doc) return;
+
+          removeInterruptModal(doc);
+          const observer = new MutationObserver(() => removeInterruptModal(doc));
+          observer.observe(doc.documentElement, { childList: true, subtree: true });
+        });
+      })();
+    </script>
+  </body>
+</html>

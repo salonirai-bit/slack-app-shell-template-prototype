@@ -15,6 +15,8 @@ import { assetPath } from "@/lib/asset-path";
 type ActivePanel =
   | { type: "prep"; dealId: string; meetingTime: string }
   | { type: "risks" }
+  | { type: "register-deals" }
+  | { type: "setup" }
   | { type: "quotes" }
   | { type: "action-items" }
   | null;
@@ -125,6 +127,15 @@ export interface PanelScript {
   toolIcon: string;
   toolName: string;
   finalResponse: React.ReactNode;
+  hideToolExecution?: boolean;
+  interactiveActions?: string[];
+  actionResponses?: Record<string, string>;
+  setupCards?: Array<{
+    icon: string;
+    title: string;
+    description: string;
+  }>;
+  setupFooterNote?: string;
 }
 
 export interface PanelData {
@@ -161,6 +172,82 @@ function buildScript(panel: NonNullable<ActivePanel>): PanelData {
                 <button key={a} className="px-3 py-1.5 text-[12px] font-semibold bg-white border border-gray-400 rounded-lg text-gray-800 hover:bg-gray-50 hover:border-gray-500 shadow-sm transition-all">{a}</button>
               ))}
             </div>
+          </div>
+        ),
+      },
+    };
+  }
+
+  if (panel.type === "setup") {
+    const setupCards = [
+      {
+        icon: "🏢",
+        title: "Set up Slack Workspace for Partners",
+        description: "A central digital hub designed to make partner workflows faster.",
+      },
+      {
+        icon: "🗒️",
+        title: "Define your Deal Rules",
+        description: "Set how deal conflicts are resolved and configure your B2B referral program",
+      },
+      {
+        icon: "🏆",
+        title: "Setup your loyalty tiers",
+        description: "Define partner tiers (Gold, Silver, Bronze) and the criteria to qualify for each",
+      },
+      {
+        icon: "🤖",
+        title: "Customise your Agentforce",
+        description: "Add topics specific to your channel, review what skills your agent supports, and sign off",
+      },
+      {
+        icon: "📚",
+        title: "Create your first training track",
+        description: "Build an onboarding learning path for newly invited partners.",
+      },
+    ];
+
+    return {
+      title: "Slackbot",
+      script: {
+        userPrompt: "Help me complete setup so I can start inviting Partners in Slack.",
+        botIntro: "I can help you set up the features. Below are the features where I require your input in order to continue and complete the setup automatically",
+        toolIcon: "⚙️",
+        toolName: "Checked Partner Community and Slack integration prerequisites",
+        hideToolExecution: true,
+        finalResponse: null,
+        setupCards,
+        setupFooterNote: "Complete these steps to unlock partner invites and launch collaboration channels.",
+      },
+    };
+  }
+
+  if (panel.type === "register-deals") {
+    return {
+      title: "Slackbot",
+      script: {
+        userPrompt: "Help me register the 4 deals from meetings I was part of this week.",
+        botIntro: "Found 4 meetings with deal signals. I drafted registrations so you can review and submit quickly:",
+        toolIcon: "🔍",
+        toolName: "Scanned your meeting notes and matched opportunities",
+        interactiveActions: ["Review all registrations", "Submit 4 deals", "Edit fields"],
+        actionResponses: {
+          "Review all registrations": "Opened all 4 registrations in review mode. I highlighted missing fields for Acme and Northstar.",
+          "Submit 4 deals": "Submitted all 4 registrations successfully. I notified channel managers for final approval.",
+          "Edit fields": "Enabled inline edit mode. You can now update value, stage, owner, and expected close date before submit.",
+        },
+        finalResponse: (
+          <div className="space-y-2">
+            {[
+              "Acme Corp · Discovery call · $180K · Stage: Qualification",
+              "Greentech · Solution workshop · $60K · Stage: Discovery",
+              "Northstar Retail · Stakeholder sync · $95K · Stage: Proposal",
+              "Sporty Nation · Renewal planning · $42K · Stage: Validation",
+            ].map((item) => (
+              <div key={item} className="p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-[12px] text-gray-800">
+                {item}
+              </div>
+            ))}
           </div>
         ),
       },
@@ -283,7 +370,14 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
   const [activeTab, setActiveTab] = useState<"Messages" | "History" | "Files">("Messages");
   const [generationStep, setGenerationStep] = useState(0);
   const [inputText, setInputText] = useState("");
+  const [completedSetupCards, setCompletedSetupCards] = useState<Record<string, boolean>>({});
+  const [activeSetupDetail, setActiveSetupDetail] = useState<string | null>(null);
+  const [actionReplies, setActionReplies] = useState<Array<{ action: string; response: string }>>([]);
+  const [notifyNewDeal, setNotifyNewDeal] = useState(true);
+  const [notifyConflict, setNotifyConflict] = useState(true);
+  const [notifyStaleDeal, setNotifyStaleDeal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const setupDetailRef = useRef<HTMLDivElement>(null);
 
   const { script } = panelData;
 
@@ -300,6 +394,17 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
     const t3 = setTimeout(() => setGenerationStep(4), 3200);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [panelData]);
+
+  useEffect(() => {
+    setCompletedSetupCards({});
+    setActiveSetupDetail(null);
+    setActionReplies([]);
+  }, [panelData]);
+
+  useEffect(() => {
+    if (activeSetupDetail !== "Define your Deal Rules") return;
+    setupDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [activeSetupDetail]);
 
   return (
     <div className="w-full flex flex-col h-full bg-white" style={{ borderLeft: "1px solid #E8E8E8" }}>
@@ -405,7 +510,7 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
                 )}
 
                 {/* Step 3+: tool execution pill */}
-                {generationStep >= 3 && (
+                {generationStep >= 3 && !script.hideToolExecution && (
                   <div className="flex items-center justify-between px-3 py-2.5 rounded-xl text-[12px]" style={{ border: "1px solid #E5E7EB", background: "#FAFAFA" }}>
                     <div className="flex items-center gap-2 text-gray-600 min-w-0">
                       <span className="flex-shrink-0">{script.toolIcon}</span>
@@ -422,7 +527,139 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
                 {/* Step 4: final response payload */}
                 {generationStep === 4 && (
                   <>
-                    {script.finalResponse}
+                    {script.setupCards ? (
+                      <div className="space-y-3">
+                        {script.setupCards.map((card) => {
+                          const isCompleted = !!completedSetupCards[card.title];
+                          return (
+                            <button
+                              key={card.title}
+                              type="button"
+                              onClick={() => {
+                                setCompletedSetupCards((prev) => ({
+                                  ...prev,
+                                  [card.title]: true,
+                                }));
+                                if (card.title === "Define your Deal Rules") {
+                                  setActiveSetupDetail(card.title);
+                                }
+                              }}
+                              className="w-full text-left rounded-2xl border border-gray-300 bg-white px-4 py-3 hover:bg-gray-50 transition-colors shadow-[0_1px_0_rgba(0,0,0,0.03)]"
+                            >
+                              <div className="flex items-start gap-3">
+                                <span className="text-[20px] leading-none mt-0.5">{card.icon}</span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <h4 className="text-[15px] font-bold text-gray-900 leading-tight">{card.title}</h4>
+                                    {isCompleted ? (
+                                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                                        <CheckCircle2 className="w-4 h-4" />
+                                      </span>
+                                    ) : (
+                                      <span className="text-[22px] text-gray-500 leading-none">→</span>
+                                    )}
+                                  </div>
+                                  <p className="text-[13px] text-gray-600 mt-1 leading-snug">{card.description}</p>
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                        {activeSetupDetail === "Define your Deal Rules" && (
+                          <div ref={setupDetailRef} className="rounded-2xl border border-gray-200 bg-[#f7f7f8] p-4">
+                            <h4 className="text-[15px] font-bold text-gray-900 mb-3">Define Deal Rules</h4>
+
+                            <div className="space-y-3">
+                              <div>
+                                <label className="block text-[12px] text-gray-700 mb-1.5">
+                                  When two partners register the same deal <span className="text-pink-600">*</span>
+                                </label>
+                                <div className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-[13px] text-gray-700">
+                                  Award to partner who registered first
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-[12px] text-gray-700 mb-1.5">
+                                  Duplicate detection window <span className="text-pink-600">*</span>
+                                </label>
+                                <div className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-[13px] text-gray-700">
+                                  30 days
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-[12px] text-gray-700 mb-1.5">Notify me when</label>
+                                <div className="rounded-xl border border-gray-300 bg-white p-3 space-y-2">
+                                  <label className="flex items-start gap-2 text-[13px] text-gray-800">
+                                    <input type="checkbox" checked={notifyNewDeal} onChange={() => setNotifyNewDeal((v) => !v)} className="mt-0.5 w-4 h-4 accent-[#1f7bb6]" />
+                                    <span>A new deal is registered by any partner</span>
+                                  </label>
+                                  <label className="flex items-start gap-2 text-[13px] text-gray-800">
+                                    <input type="checkbox" checked={notifyConflict} onChange={() => setNotifyConflict((v) => !v)} className="mt-0.5 w-4 h-4 accent-[#1f7bb6]" />
+                                    <span>A conflict is detected and needs my review</span>
+                                  </label>
+                                  <label className="flex items-start gap-2 text-[13px] text-gray-800">
+                                    <input type="checkbox" checked={notifyStaleDeal} onChange={() => setNotifyStaleDeal((v) => !v)} className="mt-0.5 w-4 h-4 accent-[#1f7bb6]" />
+                                    <span>No updates in 30 days on a registered deal</span>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 flex items-center gap-2">
+                              <button type="button" className="flex-1 rounded-xl border border-gray-300 bg-white px-3 py-2 text-[13px] font-semibold text-gray-700 hover:bg-gray-50">
+                                Clear changes
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setActiveSetupDetail(null)}
+                                className="flex-1 rounded-xl border border-[#007a5a] bg-[#007a5a] px-3 py-2 text-[13px] font-semibold text-white hover:bg-[#00684c]"
+                              >
+                                Save and Continue
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {script.setupFooterNote && (
+                          <div className="text-[11px] text-gray-400 px-1">{script.setupFooterNote}</div>
+                        )}
+                      </div>
+                    ) : (
+                      script.finalResponse
+                    )}
+
+                    {!!script.interactiveActions && script.interactiveActions.length > 0 && (
+                      <div className="flex gap-2 flex-wrap mt-2">
+                        {script.interactiveActions.map((action) => (
+                          <button
+                            key={action}
+                            type="button"
+                            onClick={() => {
+                              const response = script.actionResponses?.[action] ?? "Done. I applied that action.";
+                              setActionReplies((prev) => {
+                                if (prev.some((item) => item.action === action)) return prev;
+                                return [...prev, { action, response }];
+                              });
+                            }}
+                            className="px-3 py-1.5 text-[12px] font-semibold bg-white border border-gray-400 rounded-lg text-gray-800 hover:bg-gray-50 hover:border-gray-500 shadow-sm transition-all"
+                          >
+                            {action}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {actionReplies.length > 0 && (
+                      <div className="space-y-2 mt-2">
+                        {actionReplies.map((reply) => (
+                          <div key={reply.action} className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">{reply.action}</p>
+                            <p className="text-[12px] text-gray-800">{reply.response}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                     <div className="flex items-center justify-end gap-3 pt-1">
                       <button className="text-gray-300 hover:text-gray-500 transition-colors text-[14px]" title="Copy">📋</button>
                       <button className="text-gray-300 hover:text-green-500 transition-colors text-[14px]" title="Helpful">👍</button>
@@ -661,9 +898,10 @@ function AgendaItem({
 
 interface SlackTodayViewProps {
   onNavigateToActivity?: () => void;
+  topViewMode?: "admin" | "channel-manager" | "seller";
 }
 
-export function SlackTodayView({ onNavigateToActivity }: SlackTodayViewProps = {}) {
+export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: SlackTodayViewProps = {}) {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [showTomorrow, setShowTomorrow] = useState(false);
 
@@ -739,10 +977,14 @@ export function SlackTodayView({ onNavigateToActivity }: SlackTodayViewProps = {
 
   // Helpers to toggle panels — close if same one is re-clicked
   const openRisks = () => setActivePanel(p => p?.type === "risks" ? null : { type: "risks" });
+  const openRegisterDeals = () => setActivePanel(p => p?.type === "register-deals" ? null : { type: "register-deals" });
+  const openSetup = () => setActivePanel(p => p?.type === "setup" ? null : { type: "setup" });
   const openQuotes = () => setActivePanel(p => p?.type === "quotes" ? null : { type: "quotes" });
   const openPrep = (dealId: string, meetingTime: string) =>
     setActivePanel(p => (p?.type === "prep" && (p as {type:"prep";dealId:string}).dealId === dealId) ? null : { type: "prep", dealId, meetingTime });
   const { today } = RITA_DATA;
+  const isAdminView = topViewMode === "admin";
+  const isPartnerView = topViewMode === "seller";
 
   return (
     <ResizablePanelGroup
@@ -791,26 +1033,32 @@ export function SlackTodayView({ onNavigateToActivity }: SlackTodayViewProps = {
             {/* Focus Prompts — spinning conic-gradient border on hover */}
             <div className="grid grid-cols-3 gap-4 mb-12 w-full" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
               <FocusPill
-                onClick={openRisks}
+                onClick={isAdminView ? openRisks : isPartnerView ? openRegisterDeals : openSetup}
                 icon="🔍"
                 iconBg="bg-orange-50"
-                label="Review Q1 pipeline risks"
+                label={
+                  isAdminView
+                    ? "Review workspace risk flags"
+                    : isPartnerView
+                      ? "Register 4 deals from the meetings you were part of this week"
+                      : "Complete the setup to start inviting Partners"
+                }
                 restGradient="linear-gradient(135deg,#f9a8d4,#c084fc,#fb923c)"
                 colors="#f472b6, #c084fc, #fb923c, #f9a8d4, #f472b6"
               />
               <FocusPill
                 onClick={() => openPrep("deal-acme", "11:30am")}
-                icon="🤝"
+                icon={isAdminView ? "🛡️" : "🤝"}
                 iconBg="bg-emerald-50"
-                label="Prep for Acme Corp sync"
+                label={isAdminView ? "Prep weekly admin governance sync" : "Prep for Acme Corp sync"}
                 restGradient="linear-gradient(135deg,#34d399,#2dd4bf,#60a5fa)"
                 colors="#34d399, #2dd4bf, #60a5fa, #a5f3fc, #34d399"
               />
               <FocusPill
                 onClick={openQuotes}
-                icon="✍️"
+                icon={isAdminView ? "✅" : "✍️"}
                 iconBg="bg-blue-50"
-                label="Approve 2 pending quotes"
+                label={isAdminView ? "Approve 4 pending access requests" : "Approve 2 pending quotes"}
                 restGradient="linear-gradient(135deg,#60a5fa,#818cf8,#a78bfa)"
                 colors="#60a5fa, #818cf8, #a78bfa, #c4b5fd, #60a5fa"
               />

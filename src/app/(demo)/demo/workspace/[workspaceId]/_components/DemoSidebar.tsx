@@ -91,9 +91,10 @@ interface DemoSidebarProps {
   overrideDms?: import('@/context/DemoDataContext').DemoDM[];
   overrideChannels?: import('@/context/DemoDataContext').DemoChannel[];
   sidebarApps?: Array<{ id: string; name: string; icon: string }>;
+  topViewMode?: "admin" | "channel-manager" | "seller";
 }
 
-export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDms, overrideChannels, sidebarApps }: DemoSidebarProps = {}) {
+export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDms, overrideChannels, sidebarApps, topViewMode = "channel-manager" }: DemoSidebarProps = {}) {
   const params = useParams();
   const channelId = (params.channelId as string) || undefined;
   const { activeNav } = useNav();
@@ -131,6 +132,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
   const [unreadsOnly, setUnreadsOnly] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "compact">("list");
+  const [isPartnerCloudOpen, setIsPartnerCloudOpen] = useState(true);
 
   const showAllDmsTabs = activeNav === "home" || activeNav === "activity" || activeNav === "more";
   const showSearchAndFilters = activeNav !== "later";
@@ -190,6 +192,14 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
     const isJonnieActive = activeDMId === jonnieDM?.id;
     const isMiekActive = activeDMId === miekDM?.id;
     const isPrantikActive = activeDMId === prantikDM?.id;
+    const isPartnerLeadsActive = activeChatId === "partner-leads";
+    const isPartnerOpportunitiesActive = activeChatId === "partner-opportunities";
+    const isPartnerMarketingActive = activeChatId === "partner-marketing";
+    const isPartnerAccountsActive = activeChatId === "partner-accounts";
+    const isPartnerContactsActive = activeChatId === "partner-contacts";
+    const isPartnerMdfActive = activeChatId === "partner-mdf";
+    const isPartnerCampaignsActive = activeChatId === "partner-campaigns";
+    const isPartnerView = topViewMode === "seller";
     
     return (
       <aside className="w-[340px] h-full bg-[#350d36] text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans">
@@ -360,6 +370,121 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                 </div>
                 <Edit2Icon className="w-3 h-3 opacity-0 group-hover:opacity-100" />
               </button>
+            )}
+          </div>
+
+          {/* Section: Partner Cloud */}
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => setIsPartnerCloudOpen((open) => !open)}
+              className="w-full px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group"
+            >
+              <span className="w-4 h-4 mr-1 flex items-center justify-center text-xs">
+                {isPartnerCloudOpen ? "⌄" : "›"}
+              </span>
+              Partner Cloud
+            </button>
+            {isPartnerCloudOpen && (
+              <>
+                {isPartnerView ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-marketing")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerMarketingActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      Leads
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-contacts")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerContactsActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      Contacts
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-opportunities")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerOpportunitiesActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      Opoortunity
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-accounts")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerAccountsActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      Accounts
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-mdf")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerMdfActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      MDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-campaigns")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerCampaignsActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      Campaigns
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-leads")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerLeadsActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      Approvals
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-opportunities")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerOpportunitiesActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      Opportunities
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveChatId("partner-marketing")}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
+                        isPartnerMarketingActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      Leads
+                    </button>
+                  </>
+                )}
+              </>
             )}
           </div>
 

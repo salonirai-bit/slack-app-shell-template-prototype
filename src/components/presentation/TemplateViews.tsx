@@ -449,6 +449,469 @@ export function TemplateAgentforceContent() {
   );
 }
 
+// ─── Revenue Command Center (full-width) ──────────────────────────────────────
+
+const COMMAND_METRICS = [
+  { label: "Q1 Commit", value: "$1.18M", trend: "+12% vs last week" },
+  { label: "At Risk", value: "$312K", trend: "2 deals need exec support" },
+  { label: "Next 7 Days", value: "8 meetings", trend: "3 with procurement" },
+];
+
+const COMMAND_PRIORITIES = [
+  {
+    title: "Acme Corp procurement follow-up",
+    owner: "Rita Patel",
+    channel: "#deal-acme",
+    time: "Today · 2:30 PM",
+    status: "Needs response",
+    statusStyle: "bg-amber-100 text-amber-700",
+  },
+  {
+    title: "Sporty Nation re-engagement plan",
+    owner: "Marcus Lee",
+    channel: "#deal-sporty",
+    time: "Today · 4:00 PM",
+    status: "At risk",
+    statusStyle: "bg-rose-100 text-rose-700",
+  },
+  {
+    title: "TechStart QBR dry run checklist",
+    owner: "Lisa Park",
+    channel: "#deal-techstart",
+    time: "Tomorrow · 10:00 AM",
+    status: "On track",
+    statusStyle: "bg-emerald-100 text-emerald-700",
+  },
+];
+
+const COMMAND_RECENT_UPDATES = [
+  {
+    title: "Priya Shah shared final legal redlines for Acme.",
+    meta: "#deal-acme · 18 min ago",
+  },
+  {
+    title: "Jordan Hayes posted implementation scope for Greentech.",
+    meta: "#deal-greentech · 32 min ago",
+  },
+  {
+    title: "Dana Torres confirmed kickoff timeline with Runners Club.",
+    meta: "#deal-runners · 1 hr ago",
+  },
+];
+
+type LeadRecord = {
+  id: string;
+  account: string;
+  owner: string;
+  stage: "New" | "Contacted" | "Qualified" | "Nurture";
+  source: "Web" | "Event" | "Partner" | "Outbound";
+  score: number;
+  value: string;
+  updated: string;
+};
+
+const LEAD_ROWS: LeadRecord[] = [
+  { id: "L-1023", account: "Acme Corp", owner: "Aisha Raman", stage: "Qualified", source: "Partner", score: 92, value: "$180K", updated: "2h ago" },
+  { id: "L-1018", account: "Greentech", owner: "Noah Kim", stage: "Contacted", source: "Web", score: 76, value: "$60K", updated: "Today" },
+  { id: "L-1014", account: "Runners Club", owner: "Caleb Stone", stage: "Nurture", source: "Event", score: 64, value: "$55K", updated: "Yesterday" },
+  { id: "L-1009", account: "Sporty Nation", owner: "Prantik Banerjee", stage: "New", source: "Outbound", score: 48, value: "$42K", updated: "1d ago" },
+  { id: "L-1001", account: "TechStart", owner: "Aisha Raman", stage: "Qualified", source: "Partner", score: 88, value: "$95K", updated: "3h ago" },
+];
+
+export function TemplateLeadsView() {
+  type ApprovalTab = "mdf" | "deal-registration" | "partner-application";
+  const [activeTab, setActiveTab] = useState<ApprovalTab>("mdf");
+
+  const mdfApprovals = [
+    { partner: "CloudWave Systems", requestId: "MDF-4421", campaign: "Q2 Demand Gen", amount: "$12,500", submitted: "2h ago", owner: "Aisha Raman" },
+    { partner: "Vertex Alliance", requestId: "MDF-4418", campaign: "ABM Webinar Series", amount: "$8,900", submitted: "Today", owner: "Noah Kim" },
+    { partner: "BluePeak Tech", requestId: "MDF-4402", campaign: "Regional Event Sponsorship", amount: "$15,000", submitted: "Yesterday", owner: "Caleb Stone" },
+  ];
+
+  const dealApprovals = [
+    { partner: "CloudWave Systems", dealId: "DR-9031", account: "Acme Corp", value: "$180K", stage: "Qualification", submitted: "1h ago" },
+    { partner: "Vertex Alliance", dealId: "DR-9022", account: "Greentech", value: "$60K", stage: "Discovery", submitted: "Today" },
+    { partner: "Northstar Digital", dealId: "DR-8997", account: "Sporty Nation", value: "$42K", stage: "Proposal", submitted: "Yesterday" },
+  ];
+
+  const partnerApprovals = [
+    { company: "Summit Data Labs", appId: "PA-218", region: "North America", tier: "Gold", submittedBy: "Mira Patel", submitted: "3h ago" },
+    { company: "Catalyst Edge", appId: "PA-216", region: "EMEA", tier: "Silver", submittedBy: "Jon Park", submitted: "Today" },
+    { company: "Apex RevOps", appId: "PA-209", region: "APAC", tier: "Gold", submittedBy: "Lena Xu", submitted: "Yesterday" },
+  ];
+
+  return (
+    <div className="h-full flex flex-col overflow-hidden bg-white">
+      <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-gray-200">
+        <div>
+          <h1 className="text-[20px] font-bold text-gray-900">Pending Approvals</h1>
+          <p className="text-[13px] text-gray-500 mt-0.5">Review and action channel manager approvals in one place.</p>
+        </div>
+      </div>
+
+      <div className="px-6 pt-0 pb-0 border-b border-gray-200 shrink-0">
+        <div className="flex items-center gap-6">
+          {[
+            { id: "mdf", label: "MDF approvals" },
+            { id: "deal-registration", label: "Deal registration approval" },
+            { id: "partner-application", label: "Partner application approval" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id as ApprovalTab)}
+              className={`relative py-3 text-[14px] transition-colors ${
+                activeTab === tab.id
+                  ? "text-[#1f2328] font-semibold"
+                  : "text-[#8a8f98] hover:text-[#4b5563] font-normal"
+              }`}
+            >
+              {tab.label}
+              {activeTab === tab.id && (
+                <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-[#0f8b74] rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto min-h-0">
+        {activeTab === "mdf" && (
+          <table className="w-full text-left">
+            <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
+              <tr className="text-[12px] text-gray-500 uppercase tracking-wide">
+                <th className="px-6 py-3 font-semibold">Partner</th>
+                <th className="px-4 py-3 font-semibold">Request ID</th>
+                <th className="px-4 py-3 font-semibold">Campaign</th>
+                <th className="px-4 py-3 font-semibold">Amount</th>
+                <th className="px-4 py-3 font-semibold">Submitted</th>
+                <th className="px-4 py-3 font-semibold">Owner</th>
+                <th className="px-4 py-3 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mdfApprovals.map((row) => (
+                <tr key={row.requestId} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="px-6 py-3 text-[13px] font-semibold text-gray-900">{row.partner}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.requestId}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.campaign}</td>
+                  <td className="px-4 py-3 text-[13px] font-medium text-gray-900">{row.amount}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-500">{row.submitted}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.owner}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100">View details</button>
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[#007a5a] text-white hover:bg-[#006c4f]">Approve</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {activeTab === "deal-registration" && (
+          <table className="w-full text-left">
+            <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
+              <tr className="text-[12px] text-gray-500 uppercase tracking-wide">
+                <th className="px-6 py-3 font-semibold">Partner</th>
+                <th className="px-4 py-3 font-semibold">Deal ID</th>
+                <th className="px-4 py-3 font-semibold">Account</th>
+                <th className="px-4 py-3 font-semibold">Value</th>
+                <th className="px-4 py-3 font-semibold">Stage</th>
+                <th className="px-4 py-3 font-semibold">Submitted</th>
+                <th className="px-4 py-3 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dealApprovals.map((row) => (
+                <tr key={row.dealId} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="px-6 py-3 text-[13px] font-semibold text-gray-900">{row.partner}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.dealId}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.account}</td>
+                  <td className="px-4 py-3 text-[13px] font-medium text-gray-900">{row.value}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.stage}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-500">{row.submitted}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100">View details</button>
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[#007a5a] text-white hover:bg-[#006c4f]">Approve</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {activeTab === "partner-application" && (
+          <table className="w-full text-left">
+            <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
+              <tr className="text-[12px] text-gray-500 uppercase tracking-wide">
+                <th className="px-6 py-3 font-semibold">Company</th>
+                <th className="px-4 py-3 font-semibold">Application ID</th>
+                <th className="px-4 py-3 font-semibold">Region</th>
+                <th className="px-4 py-3 font-semibold">Tier</th>
+                <th className="px-4 py-3 font-semibold">Submitted by</th>
+                <th className="px-4 py-3 font-semibold">Submitted</th>
+                <th className="px-4 py-3 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {partnerApprovals.map((row) => (
+                <tr key={row.appId} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="px-6 py-3 text-[13px] font-semibold text-gray-900">{row.company}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.appId}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.region}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.tier}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-700">{row.submittedBy}</td>
+                  <td className="px-4 py-3 text-[13px] text-gray-500">{row.submitted}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100">View details</button>
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[#007a5a] text-white hover:bg-[#006c4f]">Approve</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PartnerPageShell({
+  title,
+  subtitle,
+  meta,
+  headers,
+  rows,
+}: {
+  title: string;
+  subtitle: string;
+  meta: Array<{ label: string; value: string }>;
+  headers: string[];
+  rows: string[][];
+}) {
+  return (
+    <div className="h-full flex flex-col overflow-hidden bg-white">
+      <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-gray-200">
+        <div>
+          <h1 className="text-[20px] font-bold text-gray-900">{title}</h1>
+          <p className="text-[13px] text-gray-500 mt-0.5">{subtitle}</p>
+        </div>
+      </div>
+
+      <div className="px-6 py-3 border-b border-gray-100 shrink-0">
+        <div className="grid grid-cols-3 gap-3">
+          {meta.map((item) => (
+            <div key={item.label} className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+              <p className="text-[11px] uppercase tracking-wide text-gray-500">{item.label}</p>
+              <p className="text-[15px] font-semibold text-gray-900 mt-0.5">{item.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto min-h-0">
+        <table className="w-full text-left">
+          <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
+            <tr className="text-[12px] text-gray-500 uppercase tracking-wide">
+              {headers.map((h) => (
+                <th key={h} className="px-4 py-3 font-semibold">{h}</th>
+              ))}
+              <th className="px-4 py-3 font-semibold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, idx) => (
+              <tr key={`${title}-${idx}`} className="border-b border-gray-100 hover:bg-gray-50">
+                {row.map((cell, cidx) => (
+                  <td key={`${idx}-${cidx}`} className="px-4 py-3 text-[13px] text-gray-700">{cell}</td>
+                ))}
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-2">
+                    <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100">View details</button>
+                    <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[#007a5a] text-white hover:bg-[#006c4f]">Approve</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export function TemplatePartnerContactsView() {
+  return (
+    <PartnerPageShell
+      title="Contacts"
+      subtitle="Manage partner contacts awaiting approval and profile updates."
+      meta={[
+        { label: "Pending", value: "14" },
+        { label: "Needs verification", value: "5" },
+        { label: "SLA", value: "24h" },
+      ]}
+      headers={["Contact", "Partner", "Role", "Email", "Status"]}
+      rows={[
+        ["Mira Patel", "CloudWave Systems", "Partner Manager", "mira@cloudwave.io", "Pending"],
+        ["Jon Park", "Vertex Alliance", "Sales Lead", "jon@vertexalliance.com", "Pending"],
+        ["Rhea Thomas", "Northstar Digital", "Campaign Lead", "rhea@northstar.digital", "Review"],
+      ]}
+    />
+  );
+}
+
+export function TemplatePartnerOpportunityView() {
+  return (
+    <PartnerPageShell
+      title="Opportunity"
+      subtitle="Review partner-submitted opportunities and route approvals."
+      meta={[
+        { label: "Open approvals", value: "9" },
+        { label: "At risk", value: "2" },
+        { label: "Pipeline value", value: "$2.1M" },
+      ]}
+      headers={["Opportunity", "Partner", "Account", "Stage", "Value"]}
+      rows={[
+        ["Q3 Expansion", "CloudWave Systems", "Acme Corp", "Qualification", "$180K"],
+        ["Renewal Upsell", "Vertex Alliance", "Greentech", "Discovery", "$60K"],
+        ["Net New", "Northstar Digital", "Sporty Nation", "Proposal", "$42K"],
+      ]}
+    />
+  );
+}
+
+export function TemplatePartnerAccountsView() {
+  return (
+    <PartnerPageShell
+      title="Accounts"
+      subtitle="Validate account mappings and ownership before go-live."
+      meta={[
+        { label: "Accounts pending", value: "21" },
+        { label: "Duplicates", value: "3" },
+        { label: "Auto-match", value: "82%" },
+      ]}
+      headers={["Account", "Partner", "Region", "Segment", "Owner"]}
+      rows={[
+        ["Acme Corp", "CloudWave Systems", "NAMER", "Enterprise", "Aisha Raman"],
+        ["Greentech", "Vertex Alliance", "EMEA", "Mid-Market", "Noah Kim"],
+        ["TechStart", "BluePeak Tech", "APAC", "Enterprise", "Caleb Stone"],
+      ]}
+    />
+  );
+}
+
+export function TemplatePartnerMdfView() {
+  return (
+    <PartnerPageShell
+      title="MDF"
+      subtitle="Approve market development fund requests and campaign budgets."
+      meta={[
+        { label: "Requests", value: "7" },
+        { label: "Budget impact", value: "$86K" },
+        { label: "Over limit", value: "1" },
+      ]}
+      headers={["Request ID", "Partner", "Campaign", "Amount", "Submitted"]}
+      rows={[
+        ["MDF-4421", "CloudWave Systems", "Q2 Demand Gen", "$12,500", "2h ago"],
+        ["MDF-4418", "Vertex Alliance", "ABM Webinar Series", "$8,900", "Today"],
+        ["MDF-4402", "BluePeak Tech", "Regional Event Sponsorship", "$15,000", "Yesterday"],
+      ]}
+    />
+  );
+}
+
+export function TemplatePartnerCampaignsView() {
+  return (
+    <PartnerPageShell
+      title="Campaigns"
+      subtitle="Review partner campaign plans and activation requests."
+      meta={[
+        { label: "Campaigns", value: "11" },
+        { label: "Ready to launch", value: "4" },
+        { label: "Needs edits", value: "3" },
+      ]}
+      headers={["Campaign", "Partner", "Type", "Start date", "Status"]}
+      rows={[
+        ["Pipeline Accelerator", "CloudWave Systems", "Digital", "Apr 10", "Pending"],
+        ["Executive Roundtable", "Vertex Alliance", "Event", "Apr 18", "Review"],
+        ["Co-sell Launch", "Northstar Digital", "Email + Webinar", "Apr 24", "Pending"],
+      ]}
+    />
+  );
+}
+
+export function TemplateRevenueCommandCenter() {
+  return (
+    <div className="h-full flex flex-col overflow-hidden bg-white">
+      <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderBottom: "1px solid #E8E8E8" }}>
+        <div>
+          <h1 className="text-[20px] font-bold text-gray-900">Revenue command center</h1>
+          <p className="text-[13px] text-gray-500 mt-0.5">Plan today, unblock risks, and move deals faster.</p>
+        </div>
+        <button className="px-3 py-1.5 text-[13px] font-semibold rounded-lg bg-[#007a5a] text-white hover:bg-[#006a4e] transition-colors">
+          Start standup
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="max-w-[980px] mx-auto px-6 py-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {COMMAND_METRICS.map((metric) => (
+              <div key={metric.label} className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+                <p className="text-[12px] font-semibold uppercase tracking-wide text-gray-500">{metric.label}</p>
+                <p className="text-[28px] font-bold text-gray-900 mt-1">{metric.value}</p>
+                <p className="text-[12px] text-gray-500 mt-1">{metric.trend}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-5">
+            <div className="rounded-2xl border border-gray-100 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-[15px] font-bold text-gray-900">Priority actions</h2>
+                <button className="text-[12px] text-gray-500 hover:text-gray-700">View all</button>
+              </div>
+              <div className="space-y-2">
+                {COMMAND_PRIORITIES.map((item) => (
+                  <div key={item.title} className="rounded-xl border border-gray-100 p-3 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-[13px] font-semibold text-gray-900 leading-snug">{item.title}</p>
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${item.statusStyle}`}>
+                        {item.status}
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-gray-500 mt-1">
+                      {item.owner} · {item.channel} · {item.time}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-gray-100 p-4">
+              <h2 className="text-[15px] font-bold text-gray-900 mb-3">Recent channel updates</h2>
+              <div className="space-y-2">
+                {COMMAND_RECENT_UPDATES.map((update) => (
+                  <div key={update.title} className="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                    <p className="text-[13px] text-gray-800 leading-snug">{update.title}</p>
+                    <p className="text-[11px] text-gray-500 mt-1">{update.meta}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── More View (content pane — sidebar shows channel+DM list) ───────────────
 
 export function TemplateMoreView() {
