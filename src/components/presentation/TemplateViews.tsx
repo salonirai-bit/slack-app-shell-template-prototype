@@ -501,7 +501,12 @@ const COMMAND_RECENT_UPDATES = [
 
 type LeadRecord = {
   id: string;
+  name: string;
+  email: string;
   account: string;
+  rating: "Warm" | "Hot" | "Cool";
+  state: string;
+  status: "New" | "Working" | "Qualified" | "Contacted";
   owner: string;
   stage: "New" | "Contacted" | "Qualified" | "Nurture";
   source: "Web" | "Event" | "Partner" | "Outbound";
@@ -511,12 +516,312 @@ type LeadRecord = {
 };
 
 const LEAD_ROWS: LeadRecord[] = [
-  { id: "L-1023", account: "Acme Corp", owner: "Aisha Raman", stage: "Qualified", source: "Partner", score: 92, value: "$180K", updated: "2h ago" },
-  { id: "L-1018", account: "Greentech", owner: "Noah Kim", stage: "Contacted", source: "Web", score: 76, value: "$60K", updated: "Today" },
-  { id: "L-1014", account: "Runners Club", owner: "Caleb Stone", stage: "Nurture", source: "Event", score: 64, value: "$55K", updated: "Yesterday" },
-  { id: "L-1009", account: "Sporty Nation", owner: "Prantik Banerjee", stage: "New", source: "Outbound", score: 48, value: "$42K", updated: "1d ago" },
-  { id: "L-1001", account: "TechStart", owner: "Aisha Raman", stage: "Qualified", source: "Partner", score: 88, value: "$95K", updated: "3h ago" },
+  { id: "L-1023", name: "William Ravenwood", email: "wravenwood@example.com", account: "Flextech, Inc.", rating: "Warm", state: "IL", status: "New", owner: "Aisha Raman", stage: "Qualified", source: "Partner", score: 92, value: "$180K", updated: "2h ago" },
+  { id: "L-1018", name: "Trevor Atz", email: "tatz@example.com", account: "Big Blue Consulting", rating: "Warm", state: "CA", status: "New", owner: "Noah Kim", stage: "Contacted", source: "Web", score: 76, value: "$60K", updated: "Today" },
+  { id: "L-1014", name: "Tisha Goetz", email: "tgoetz@example.com", account: "S & S Canopies", rating: "Warm", state: "IN", status: "Working", owner: "Caleb Stone", stage: "Nurture", source: "Event", score: 64, value: "$55K", updated: "Yesterday" },
+  { id: "L-1009", name: "Tenisha Mabery", email: "tmabery@example.com", account: "J R Gillis Assoc", rating: "Hot", state: "CA", status: "Working", owner: "Prantik Banerjee", stage: "New", source: "Outbound", score: 48, value: "$42K", updated: "1d ago" },
+  { id: "L-1001", name: "Rosa Abelin", email: "roabelin@example.com", account: "Universe Design", rating: "Warm", state: "TX", status: "Qualified", owner: "Aisha Raman", stage: "Qualified", source: "Partner", score: 88, value: "$95K", updated: "3h ago" },
+  { id: "L-0997", name: "Ron Abelin", email: "rabelin@example.com", account: "DataTek Applications", rating: "Hot", state: "CA", status: "New", owner: "Noah Kim", stage: "Contacted", source: "Web", score: 79, value: "$51K", updated: "Today" },
+  { id: "L-0991", name: "Riley Shultz", email: "rshultz@example.com", account: "Interstate Brands", rating: "Warm", state: "MA", status: "Qualified", owner: "Caleb Stone", stage: "Qualified", source: "Partner", score: 85, value: "$74K", updated: "5h ago" },
+  { id: "L-0987", name: "Rick Stein", email: "rstein@example.com", account: "Solstice, Inc.", rating: "Cool", state: "WA", status: "New", owner: "Aisha Raman", stage: "New", source: "Event", score: 58, value: "$33K", updated: "6h ago" },
+  { id: "L-0982", name: "Monte Scharff", email: "mscharff@example.com", account: "Cardinal Distributing", rating: "Hot", state: "MA", status: "Working", owner: "Noah Kim", stage: "Contacted", source: "Web", score: 81, value: "$69K", updated: "Today" },
+  { id: "L-0976", name: "Mellissa Harwood", email: "mharwood@example.com", account: "Williams Plumbing", rating: "Warm", state: "TX", status: "Working", owner: "Caleb Stone", stage: "Nurture", source: "Outbound", score: 71, value: "$48K", updated: "Yesterday" },
+  { id: "L-0971", name: "Maye Head", email: "mhead@example.com", account: "Ram Tool & Supply", rating: "Warm", state: "FL", status: "Working", owner: "Prantik Banerjee", stage: "Contacted", source: "Partner", score: 74, value: "$52K", updated: "1d ago" },
+  { id: "L-0968", name: "Mary Conners", email: "mconners@example.com", account: "Storage Solutions, Inc.", rating: "Warm", state: "CA", status: "Contacted", owner: "Aisha Raman", stage: "Contacted", source: "Web", score: 67, value: "$41K", updated: "Today" },
+  { id: "L-0961", name: "Linda Collins", email: "lcollins@example.com", account: "Collingwood Enterprises", rating: "Warm", state: "MN", status: "New", owner: "Noah Kim", stage: "New", source: "Event", score: 62, value: "$37K", updated: "2d ago" },
+  { id: "L-0956", name: "Lee Ortis", email: "lortis@example.com", account: "Daily Interlake", rating: "Cool", state: "CO", status: "Working", owner: "Caleb Stone", stage: "Nurture", source: "Outbound", score: 55, value: "$29K", updated: "2d ago" },
+  { id: "L-0950", name: "Ava Kirchner", email: "akirchner@example.com", account: "Northline Logistics", rating: "Hot", state: "NY", status: "Qualified", owner: "Prantik Banerjee", stage: "Qualified", source: "Partner", score: 90, value: "$120K", updated: "4h ago" },
+  { id: "L-0942", name: "Nolan Briggs", email: "nbriggs@example.com", account: "Peak Retail Group", rating: "Warm", state: "AZ", status: "Working", owner: "Aisha Raman", stage: "Contacted", source: "Web", score: 73, value: "$57K", updated: "Yesterday" },
+  { id: "L-0937", name: "Elena Moss", email: "emoss@example.com", account: "Vertex BioLabs", rating: "Hot", state: "NC", status: "Qualified", owner: "Noah Kim", stage: "Qualified", source: "Partner", score: 87, value: "$98K", updated: "5h ago" },
+  { id: "L-0931", name: "Harper Sloan", email: "hsloan@example.com", account: "Summit Health Works", rating: "Warm", state: "UT", status: "Contacted", owner: "Caleb Stone", stage: "Contacted", source: "Event", score: 69, value: "$44K", updated: "Today" },
+  { id: "L-0926", name: "Gavin Doyle", email: "gdoyle@example.com", account: "Blue Harbor Labs", rating: "Cool", state: "OR", status: "New", owner: "Prantik Banerjee", stage: "New", source: "Outbound", score: 53, value: "$31K", updated: "3d ago" },
+  { id: "L-0920", name: "Sonia Rivas", email: "srivas@example.com", account: "Orbit Commerce", rating: "Warm", state: "NV", status: "Working", owner: "Aisha Raman", stage: "Nurture", source: "Web", score: 72, value: "$46K", updated: "1d ago" },
+  { id: "L-0914", name: "Derek Holland", email: "dholland@example.com", account: "Crestline Partners", rating: "Hot", state: "PA", status: "Qualified", owner: "Noah Kim", stage: "Qualified", source: "Partner", score: 91, value: "$132K", updated: "2h ago" },
+  { id: "L-0908", name: "Priyanka Nair", email: "pnair@example.com", account: "Sable Security", rating: "Warm", state: "VA", status: "Contacted", owner: "Caleb Stone", stage: "Contacted", source: "Event", score: 68, value: "$43K", updated: "Today" },
+  { id: "L-0902", name: "Owen Park", email: "opark@example.com", account: "Helio Manufacturing", rating: "Cool", state: "MI", status: "Working", owner: "Prantik Banerjee", stage: "Nurture", source: "Outbound", score: 57, value: "$35K", updated: "2d ago" },
 ];
+
+function statusPillClass(status: LeadRecord["status"]) {
+  if (status === "New") return "bg-[#eef2ff] text-[#4f46e5]";
+  if (status === "Working") return "bg-[#f3e8ff] text-[#7e22ce]";
+  if (status === "Qualified") return "bg-[#fff3e0] text-[#b45309]";
+  return "bg-[#f3f4f6] text-[#4b5563]";
+}
+
+function ratingPillClass(rating: LeadRecord["rating"]) {
+  if (rating === "Hot") return "bg-[#e8edff] text-[#3348a3]";
+  if (rating === "Warm") return "bg-[#f7e8ff] text-[#8a2ca0]";
+  return "bg-[#ececec] text-[#525252]";
+}
+
+export function TemplatePartnerLeadsView() {
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [isLogCallModalOpen, setIsLogCallModalOpen] = useState(false);
+  const [logCallComments, setLogCallComments] = useState("");
+  const selectedLead = LEAD_ROWS.find((row) => row.id === selectedLeadId) ?? null;
+
+  return (
+    <div className="h-full flex flex-col overflow-hidden bg-white">
+      <div className="px-6 py-4 border-b border-gray-200 shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Star className="w-4 h-4 text-[#1f2937]" />
+            <h1 className="text-[22px] font-bold text-[#1f2937]">My Open Leads</h1>
+            <span className="text-[12px] font-semibold text-[#4f46e5] bg-[#eef2ff] rounded-md px-2 py-0.5">
+              Leads
+            </span>
+          </div>
+          <button type="button" className="text-[13px] text-gray-500 hover:text-gray-700">
+            Share
+          </button>
+        </div>
+      </div>
+
+      <div className="px-6 py-3 border-b border-gray-100 shrink-0 flex items-center gap-2">
+        <button type="button" className="h-8 px-3 rounded-md border border-gray-300 text-[13px] text-gray-700 hover:bg-gray-50">
+          Edit view
+        </button>
+        <div className="h-8 w-8 rounded-md border border-gray-300 flex items-center justify-center text-gray-500">
+          <Search className="w-4 h-4" />
+        </div>
+        <button type="button" className="h-8 px-3 rounded-md border border-gray-300 text-[13px] text-gray-700 hover:bg-gray-50">
+          Sort: 1
+        </button>
+        <button type="button" className="h-8 px-3 rounded-md border border-gray-300 text-[13px] text-gray-700 hover:bg-gray-50">
+          Rating is any of
+        </button>
+      </div>
+
+      <div className="flex-1 min-h-0 flex overflow-hidden">
+        <div className={`${selectedLead ? "w-[62%]" : "w-full"} min-w-0 overflow-auto border-r border-gray-200`}>
+          <table className="w-full text-left">
+            <thead className="sticky top-0 bg-[#fafafa] border-b border-gray-200">
+              <tr className="text-[12px] text-gray-500">
+                <th className="px-6 py-3 font-semibold">Name</th>
+                <th className="px-4 py-3 font-semibold">Email</th>
+                <th className="px-4 py-3 font-semibold">Company</th>
+                <th className="px-4 py-3 font-semibold">Rating</th>
+                <th className="px-4 py-3 font-semibold">State/Province</th>
+                <th className="px-4 py-3 font-semibold">Lead Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {LEAD_ROWS.map((row) => (
+                <tr
+                  key={row.id}
+                  className={`border-b border-gray-100 hover:bg-gray-50 ${selectedLeadId === row.id ? "bg-[#eaf6fb]" : ""}`}
+                >
+                  <td className="px-6 py-3 text-[14px] font-semibold">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedLeadId(row.id)}
+                      className="text-[#1f4f75] hover:underline"
+                    >
+                      {row.name}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 text-[14px] text-[#1f6f95]">{row.email}</td>
+                  <td className="px-4 py-3 text-[14px] text-gray-700">{row.account}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${ratingPillClass(row.rating)}`}>
+                      {row.rating}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-[14px] text-gray-700">{row.state}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${statusPillClass(row.status)}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {selectedLead && (
+          <div className="w-[38%] min-w-[340px] max-w-[460px] h-full overflow-auto bg-white">
+            <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-[12px] text-gray-500">Lead</p>
+                <h2 className="text-[28px] font-bold text-gray-900 leading-tight">{selectedLead.name}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedLeadId(null)}
+                className="text-[18px] text-gray-400 hover:text-gray-700"
+                aria-label="Close details panel"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="px-4 py-2 border-b border-gray-200">
+              <div className="flex items-center gap-6 text-[13px]">
+                <button type="button" className="font-semibold text-[#6a2a7b] border-b-2 border-[#6a2a7b] pb-1">
+                  Details
+                </button>
+                <button type="button" className="text-gray-500 hover:text-gray-700 pb-1">
+                  Conversations
+                </button>
+              </div>
+            </div>
+
+            <div className="px-4 py-4 space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-[14px] font-semibold text-gray-900">Quick actions</h3>
+                  <button type="button" className="text-[12px] text-[#1f6f95] hover:underline">
+                    See all actions
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsLogCallModalOpen(true)}
+                    className="h-12 rounded-xl border border-gray-200 bg-[#f8fafc] text-[13px] font-semibold text-gray-800 hover:bg-[#f1f5f9]"
+                  >
+                    Log a Call
+                  </button>
+                  <button type="button" className="h-12 rounded-xl border border-gray-200 bg-[#f8fafc] text-[13px] font-semibold text-gray-800 hover:bg-[#f1f5f9]">
+                    Email
+                  </button>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-gray-200 overflow-hidden">
+                <div className="px-3 py-2 bg-[#fafafa] border-b border-gray-200 flex items-center justify-between">
+                  <h3 className="text-[13px] font-semibold text-gray-800">Record details</h3>
+                  <button type="button" className="text-[12px] text-[#1f6f95] hover:underline">
+                    Open in Salesforce
+                  </button>
+                </div>
+                <div className="p-3 space-y-3">
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">Lead ID</span>
+                    <span className="text-gray-900 font-medium">{selectedLead.id}</span>
+                  </div>
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">First Name</span>
+                    <span className="text-gray-900">{selectedLead.name.split(" ")[0]}</span>
+                  </div>
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">Last Name</span>
+                    <span className="text-gray-900">{selectedLead.name.split(" ").slice(1).join(" ")}</span>
+                  </div>
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">Lead Owner</span>
+                    <span className="text-gray-900">{selectedLead.owner}</span>
+                  </div>
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">Company</span>
+                    <span className="text-gray-900">{selectedLead.account}</span>
+                  </div>
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">Email</span>
+                    <span className="text-[#1f6f95]">{selectedLead.email}</span>
+                  </div>
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">State</span>
+                    <span className="text-gray-900">{selectedLead.state}</span>
+                  </div>
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">Lead Status</span>
+                    <span className="text-gray-900">{selectedLead.status}</span>
+                  </div>
+                  <div className="grid grid-cols-[110px_1fr] gap-2 text-[13px]">
+                    <span className="text-gray-500">Rating</span>
+                    <span className="text-gray-900">{selectedLead.rating}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {isLogCallModalOpen && selectedLead && (
+        <div className="absolute inset-0 z-50 bg-black/35 flex items-center justify-center p-4">
+          <div className="w-full max-w-[520px] max-h-[70vh] bg-white rounded-xl border border-gray-200 shadow-2xl overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-gray-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-md bg-[#3558d4] text-white flex items-center justify-center text-[12px]">
+                  📇
+                </div>
+                <h2 className="text-[24px] leading-none font-semibold text-[#1f2328]">Log a Call</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsLogCallModalOpen(false)}
+                className="text-[20px] leading-none text-gray-400 hover:text-gray-700"
+                aria-label="Close log a call modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="px-4 py-3.5 overflow-auto max-h-[calc(70vh-116px)]">
+              <p className="text-[14px] italic text-gray-600 mb-4">
+                <span className="text-[#c81e5b]">*</span> Indicates a required field
+              </p>
+
+              <div className="mb-4">
+                <label className="block text-[18px] font-semibold text-[#1f2328] mb-2">Subject</label>
+                <button
+                  type="button"
+                  className="w-full h-[42px] px-3 rounded-lg border border-gray-300 text-[15px] text-left text-gray-700 flex items-center justify-between"
+                >
+                  Call
+                  <span className="text-[14px] text-gray-500">⌄</span>
+                </button>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <h3 className="text-[20px] font-semibold text-[#1f2328] mb-4">Details</h3>
+
+                <div className="space-y-3.5">
+                  <div className="grid grid-cols-[90px_1fr] items-center gap-2.5">
+                    <span className="text-[14px] text-[#1f2328]">Comments</span>
+                    <textarea
+                      value={logCallComments}
+                      onChange={(e) => setLogCallComments(e.target.value)}
+                      placeholder="Add text"
+                      rows={2}
+                      className="w-full resize-none rounded-md border border-gray-300 px-2.5 py-1.5 text-[13px] text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3558d4]/30 focus:border-[#3558d4]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-[90px_1fr] items-center gap-2.5">
+                    <span className="text-[14px] text-[#1f2328]">Name</span>
+                    <div className="inline-flex w-fit items-center rounded-md bg-[#e9f6ff] px-2.5 py-1 text-[13px] font-semibold text-[#1f2328]">
+                      {selectedLead.name}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-[90px_1fr] items-start gap-2.5">
+                    <span className="text-[14px] text-[#1f2328] mt-0.5">Related To</span>
+                    <p className="text-[13px] leading-snug text-gray-500">
+                      You can&apos;t add related records when the person you select in the Name field is a lead.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-4 py-3 border-t border-gray-200 flex justify-end bg-[#fafafa]">
+              <button
+                type="button"
+                className="h-9 px-5 rounded-lg bg-gray-200 text-[14px] font-medium text-gray-700 hover:bg-gray-300"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function TemplateLeadsView() {
   type ApprovalTab = "mdf" | "deal-registration" | "partner-application";

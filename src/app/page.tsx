@@ -10,6 +10,7 @@ import {
   TemplateAgentforceContent,
   TemplateRevenueCommandCenter,
   TemplateLeadsView,
+  TemplatePartnerLeadsView,
   TemplatePartnerContactsView,
   TemplatePartnerOpportunityView,
   TemplatePartnerAccountsView,
@@ -60,6 +61,9 @@ export default function Home() {
         }
         if (effectiveChatId === "partner-contacts") {
           return <TemplatePartnerContactsView />;
+        }
+        if (effectiveChatId === "partner-marketing") {
+          return <TemplatePartnerLeadsView />;
         }
         if (effectiveChatId === "partner-opportunities") {
           return <TemplatePartnerOpportunityView />;
