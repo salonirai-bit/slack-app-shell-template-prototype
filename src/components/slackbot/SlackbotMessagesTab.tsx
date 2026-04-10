@@ -13,6 +13,7 @@ import { DEMO_USER_NAME } from "@/context/DemoDataContext";
 import { SLACK_TOKENS } from "@/design/slack-tokens";
 import { ChatMessage as GlobalChatMessage } from "@/components/shared/ChatMessage";
 import { assetPath } from "@/lib/asset-path";
+import { useDealRegistrationPrompt } from "@/context/DealRegistrationPromptContext";
 
 const T = SLACK_TOKENS;
 
@@ -204,6 +205,50 @@ interface ChatMessage {
 const USER_AVATAR = "https://randomuser.me/api/portraits/med/women/90.jpg";
 const SLACKBOT_AVATAR = assetPath("/slackbot-logo.svg");
 
+const DEAL_REGISTRATION_PROMPT_TEXT =
+  "Let's register this new deal. Please share everything you have: account or company name, deal name, amount or range, stage, expected close date, partner involved, champion or stakeholders, and any other context (competition, risks, next steps). I'll turn it into a clean summary you can submit.";
+
+const DEAL_REGISTERED_CHANNEL_MANAGER_TEXT =
+  "Your deal registration has been sent to the channel manager. They'll review what we captured and follow up in Slack if anything's missing.";
+
+const DEAL_REGISTRATION_ASK_MORE_TEXT =
+  "Sure — what else should I include? Account, amount, stage, dates, partner, stakeholders, or risks all help.";
+
+type DealRegFlow =
+  | { kind: "idle" }
+  | {
+      kind: "active";
+      snippets: string[];
+      /** True after we’ve shown the running summary and asked “more or ready?” */
+      awaitingDecision: boolean;
+    };
+
+function wantsToSubmit(text: string): boolean {
+  const t = text.toLowerCase().trim();
+  if (t.length > 160) return false;
+  if (/^yes[\s!.]*$/i.test(t)) return true;
+  return (
+    /^(yes,?\s*)?(i'?m\s+)?(ready|submit|that'?s all|that is all|done|no more|nothing else|go ahead|send it|finalize|register(\s+it)?|looks good|all set|that works)[\s!.]*$/i.test(
+      t
+    ) || /^(i'?m\s+)?ready(\s+to\s+(submit|register))?[\s!.]*$/i.test(t)
+  );
+}
+
+function wantsMoreOnly(text: string): boolean {
+  const t = text.toLowerCase().trim();
+  if (t.length > 100) return false;
+  return /^(more|add more|not yet|keep going|more details|another detail|i have more)[\s!.?]*$/i.test(t);
+}
+
+function buildDealSummaryReply(snippets: string[]): string {
+  const body =
+    snippets.length === 0
+      ? "(Nothing captured yet — add something about the account, amount, or stage.)"
+      : snippets.map((s, i) => `${i + 1}. ${s}`).join("\n");
+
+  return `Here's what I've captured for the new deal:\n\n${body}\n\nWant to add more, or are you ready to register this deal? Reply \"more\" to keep going, or \"ready\" / \"submit\" when you're done.`;
+}
+
 interface SlackbotMessagesTabProps {
   history?: ChatMessage[];
   onUpdateHistory?: (history: ChatMessage[]) => void;
@@ -211,10 +256,19 @@ interface SlackbotMessagesTabProps {
 }
 
 export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessage }: SlackbotMessagesTabProps) {
+  const {
+    promptKey: dealRegistrationPromptKey,
+    deliveredPromptKey: dealRegistrationDeliveredKey,
+    markDealPromptDelivered,
+  } = useDealRegistrationPrompt();
   const [messages, setMessages] = useState<ChatMessage[]>(history);
   const [isTyping, setIsTyping] = useState(false);
   const prevHistoryRef = useRef<string>(JSON.stringify(history));
   const historyLengthRef = useRef<number>(history.length);
+  /** Prevents duplicate appends when Strict Mode runs the effect twice before `deliveredPromptKey` updates. */
+  const lastAppendedDealRegistrationKeyRef = useRef(0);
+  const dealRegFlowRef = useRef<DealRegFlow>({ kind: "idle" });
+  const botReplyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync local messages with history prop when it changes externally (only if actually different)
   useEffect(() => {
@@ -240,9 +294,53 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
     }
   }, [history]); // Only depend on history - messages comparison done inside via setState updater
 
+  useEffect(() => {
+    return () => {
+      if (botReplyTimeoutRef.current) {
+        clearTimeout(botReplyTimeoutRef.current);
+        botReplyTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (dealRegistrationPromptKey <= 0) return;
+    if (dealRegistrationPromptKey <= dealRegistrationDeliveredKey) return;
+    if (lastAppendedDealRegistrationKeyRef.current === dealRegistrationPromptKey) return;
+    lastAppendedDealRegistrationKeyRef.current = dealRegistrationPromptKey;
+
+    const botMsg: ChatMessage = {
+      id: `deal-reg-${dealRegistrationPromptKey}-${Date.now()}`,
+      role: "bot",
+      content: DEAL_REGISTRATION_PROMPT_TEXT,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => {
+      const next = [...prev, botMsg];
+      onUpdateHistory?.(next);
+      return next;
+    });
+    dealRegFlowRef.current = {
+      kind: "active",
+      snippets: [],
+      awaitingDecision: false,
+    };
+    markDealPromptDelivered(dealRegistrationPromptKey);
+  }, [
+    dealRegistrationPromptKey,
+    dealRegistrationDeliveredKey,
+    markDealPromptDelivered,
+    onUpdateHistory,
+  ]);
+
   const sendMessage = useCallback((text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
+
+    if (botReplyTimeoutRef.current) {
+      clearTimeout(botReplyTimeoutRef.current);
+      botReplyTimeoutRef.current = null;
+    }
 
     const userMsg: ChatMessage = {
       id: `u-${Date.now()}`,
@@ -250,29 +348,60 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
       content: trimmed,
       timestamp: new Date(),
     };
-    
+
     setMessages((prev) => {
       const newMessages = [...prev, userMsg];
       onUpdateHistory?.(newMessages);
       return newMessages;
     });
-    
+
     setIsTyping(true);
 
-    setTimeout(() => {
-      const blocks = getResponseBlocks(trimmed);
+    const flow = dealRegFlowRef.current;
+    let botPayload: { content?: string; blocks?: SlackBlock[] };
+
+    if (flow.kind === "active") {
+      const f = flow;
+      if (f.awaitingDecision) {
+        if (wantsToSubmit(trimmed)) {
+          dealRegFlowRef.current = { kind: "idle" };
+          botPayload = { content: DEAL_REGISTERED_CHANNEL_MANAGER_TEXT };
+        } else if (wantsMoreOnly(trimmed)) {
+          dealRegFlowRef.current = { ...f, awaitingDecision: false };
+          botPayload = { content: DEAL_REGISTRATION_ASK_MORE_TEXT };
+        } else {
+          const snippets = [...f.snippets, trimmed];
+          dealRegFlowRef.current = { ...f, snippets, awaitingDecision: true };
+          botPayload = { content: buildDealSummaryReply(snippets) };
+        }
+      } else if (f.snippets.length === 0 && wantsToSubmit(trimmed)) {
+        botPayload = {
+          content:
+            "I don't have any deal details yet. Add a line or two (company, amount, stage, close date, partner…), then say when you're ready to register.",
+        };
+      } else {
+        const snippets = [...f.snippets, trimmed];
+        dealRegFlowRef.current = { ...f, snippets, awaitingDecision: true };
+        botPayload = { content: buildDealSummaryReply(snippets) };
+      }
+    } else {
+      botPayload = { blocks: getResponseBlocks(trimmed) };
+    }
+
+    botReplyTimeoutRef.current = setTimeout(() => {
+      botReplyTimeoutRef.current = null;
       const botMsg: ChatMessage = {
         id: `b-${Date.now()}`,
         role: "bot",
-        blocks,
         timestamp: new Date(),
+        ...botPayload,
       };
       setMessages((prevMsgs) => {
         const finalMessages = [...prevMsgs, botMsg];
         onUpdateHistory?.(finalMessages);
-        setIsTyping(false);
         return finalMessages;
       });
+      setIsTyping(false);
     }, 600);
   }, [onUpdateHistory]);
 

@@ -202,7 +202,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
     const isPartnerView = topViewMode === "seller";
     
     return (
-      <aside className="w-[340px] h-full bg-[#350d36] text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans">
+      <aside className="w-[340px] h-full bg-black text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans">
         {/* Workspace Header */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-white/10 hover:bg-white/5 cursor-pointer transition-colors flex-shrink-0">
           <div className="font-bold text-white text-[15px] flex items-center gap-1">
@@ -219,7 +219,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
         </div>
 
         {/* Scrollable Channel Tree */}
-        <div className="flex-1 overflow-y-auto py-3 custom-scrollbar relative">
+        <div className="flex-1 overflow-y-auto py-3 custom-scrollbar bg-[#1f1f23]">
           {/* Top Links */}
           <div className="space-y-0.5 mb-5">
             <button className="w-full flex items-center px-4 py-1 hover:bg-white/5 text-[15px]">
@@ -364,7 +364,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                         target.src = getAvatarUrl("Prantik Banerjee", 20);
                       }}
                     />
-                    <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border border-[#350d36]"></div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border border-[#1f1f23]"></div>
                   </div>
                   Prantik Banerjee <span className="ml-1 opacity-70 text-sm">you</span> <span className="ml-1">🤒</span>
                 </div>
@@ -518,13 +518,6 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
               <img src={assetPath("/Salesforce.png")} alt="channel" className="w-3.5 h-3.5 mr-2 object-contain opacity-70 grayscale" /> ux-agentic-experiences
             </button>
           </div>
-
-          {/* Floating Unread Pill */}
-          <div className="absolute bottom-6 left-0 right-0 flex justify-center pointer-events-none">
-            <button className="bg-[#e4b5f8] text-[#350d36] text-[13px] font-bold px-4 py-1.5 rounded-full shadow-lg pointer-events-auto flex items-center gap-2 hover:bg-[#d6a5eb]">
-              ↓ Unread mentions
-            </button>
-          </div>
         </div>
       </aside>
     );
@@ -565,7 +558,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
     ];
 
     return (
-      <aside className="w-[340px] h-full bg-[#350d36] text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans">
+      <aside className="w-[340px] h-full bg-black text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans">
         {/* Header */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-white/10 flex-shrink-0">
           <span className="font-bold text-white text-[15px]">Files</span>
@@ -575,7 +568,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
         </div>
 
         {/* Scrollable nav + file lists */}
-        <div className="flex-1 overflow-y-auto py-3 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto py-3 custom-scrollbar bg-[#1f1f23]">
           {/* Nav items */}
           <div className="space-y-0.5 mb-5 px-2">
             <button className="w-full flex items-center px-3 py-1.5 rounded-md bg-[#5c2c5d] text-white text-[14px] font-bold">

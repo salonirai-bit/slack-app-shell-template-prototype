@@ -3,17 +3,14 @@
 import React from "react";
 import { useSlackbot } from "../_context/demo-layout-context";
 import { IconSearch } from "@/components/icons";
-import { SLACK_TOKENS } from "@/design/slack-tokens";
 import { assetPath } from "@/lib/asset-path";
-
-const T = SLACK_TOKENS;
 
 export function AppHeader() {
   const { isOpen, toggle } = useSlackbot();
   return (
     <header
-      className="h-12 shrink-0 flex items-center w-full relative"
-      style={{ zIndex: 100, backgroundColor: T.colors.globalBg, marginTop: 0 }}
+      className="h-12 shrink-0 flex items-center w-full relative bg-black"
+      style={{ zIndex: 100, marginTop: 0 }}
     >
       {/* Spacer: align with list pillar (72px icon bar) - arrows start after */}
       <div className="w-[72px] shrink-0" aria-hidden />
@@ -56,7 +53,7 @@ export function AppHeader() {
         </button>
       </div>
 
-      {/* Right: Call + Bell + Help + Give Feedback + User (right-aligned) */}
+      {/* Right: Call + Bell + Help + Give Feedback (right-aligned) */}
       <div className="flex items-center gap-1 pl-4 pr-4 shrink-0 ml-auto">
         {/* Call */}
         <button className="p-2 rounded hover:bg-white/10 text-white/90 transition-colors" title="Calls">
@@ -88,16 +85,6 @@ export function AppHeader() {
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
           <span>Give Feedback</span>
-        </button>
-
-        {/* User */}
-        <button className="flex items-center gap-2 pl-2 pr-1 py-1.5 rounded hover:bg-white/10 text-white/90 transition-colors">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-            <span className="text-xs font-bold text-white">P</span>
-          </div>
-          <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
         </button>
       </div>
     </header>

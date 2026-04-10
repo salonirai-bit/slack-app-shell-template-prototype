@@ -420,8 +420,7 @@ export function DemoIconBar({ onPrimaryNavChange, onNavChange, showDMBadge = fal
   return (
     <>
       <aside
-        className="w-[72px] flex-shrink-0 flex flex-col items-center py-4 gap-0"
-        style={{ backgroundColor: T.colors.globalBg }}
+        className="w-[72px] flex-shrink-0 flex flex-col items-center py-4 gap-0 bg-black"
       >
         {/* Logo */}
         <div className="mb-4 flex items-center justify-center">
@@ -526,13 +525,14 @@ export function DemoIconBar({ onPrimaryNavChange, onNavChange, showDMBadge = fal
         </button>
 
         {/* Profile avatar */}
-        <div
-          className="w-8 h-8 bg-white/20 flex items-center justify-center mt-2"
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={assetPath("/profile-persona.png")}
+          alt="Profile"
+          className="w-8 h-8 mt-2 object-cover border border-white/20 shrink-0"
           style={{ borderRadius: `${T.radius.avatar}px` }}
           title="Profile"
-        >
-          <span className="text-[10px] font-bold text-white">P</span>
-        </div>
+        />
       </aside>
 
       {/* ── Flyout overlay panel (fixed, escapes overflow:hidden parent) ── */}

@@ -3,9 +3,10 @@
   "version": "0.1.1",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
-    "build": "next build",
-    "build:pages": "next build && rm -rf docs && cp -r out docs && touch docs/.nojekyll",
+    "dev": "env -u NEXT_USE_PAGES_BASE NODE_OPTIONS='--max-old-space-size=4096' next dev -H 127.0.0.1 -p 3040 --experimental-https",
+    "dev:http": "env -u NEXT_USE_PAGES_BASE NODE_OPTIONS='--max-old-space-size=4096' next dev -H 127.0.0.1 -p 3040",
+    "build": "NEXT_USE_PAGES_BASE=1 next build",
+    "build:pages": "NEXT_USE_PAGES_BASE=1 next build && rm -rf docs && cp -r out docs && touch docs/.nojekyll",
     "start": "next start",
     "lint": "next lint",
     "heroku-postbuild": "echo \"Build: $(date -u +%Y%m%d%H%M%S)\" > public/build-id.txt && npm run build"

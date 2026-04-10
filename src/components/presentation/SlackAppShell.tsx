@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ReactNode, useEffect, createContext, useContext } from "react";
+import { useState, useRef, ReactNode, useEffect, useCallback, createContext, useContext } from "react";
 import { SLACK_TOKENS } from "@/design/slack-tokens";
 import {
   ResizableHandle,
@@ -17,6 +17,7 @@ import {
   type DemoContext,
 } from "@/app/(demo)/demo/workspace/[workspaceId]/_context/demo-layout-context";
 import { motion } from "framer-motion";
+import { DealRegistrationPromptProvider } from "@/context/DealRegistrationPromptContext";
 
 const T = SLACK_TOKENS;
 
@@ -104,6 +105,8 @@ export function SlackAppShell({
   topViewMode = "channel-manager",
 }: SlackAppShellProps) {
   const [isSlackbotOpen, setIsSlackbotOpen] = useState(forceSlackbotOpen);
+  const [dealRegistrationPromptKey, setDealRegistrationPromptKey] = useState(0);
+  const [dealRegistrationDeliveredKey, setDealRegistrationDeliveredKey] = useState(0);
 
   // Keep open-state in sync with the Concept's forceSlackbotOpen prop
   const prevForceRef = useRef(forceSlackbotOpen);
@@ -120,6 +123,16 @@ export function SlackAppShell({
     onSlackbotToggle?.(next);
   };
 
+  const requestRegisterDealPrompt = useCallback(() => {
+    setIsSlackbotOpen(true);
+    onSlackbotToggle?.(true);
+    setDealRegistrationPromptKey((k) => k + 1);
+  }, [onSlackbotToggle]);
+
+  const markDealPromptDelivered = useCallback((key: number) => {
+    setDealRegistrationDeliveredKey((prev) => (key > prev ? key : prev));
+  }, []);
+
   // Resolve bot panel: concept-supplied content or default
   const botPanel = botPayload ?? (
     <SlackbotPanel
@@ -131,6 +144,14 @@ export function SlackAppShell({
     <ActiveChatContext.Provider
       value={{ activeChatId: activeChatId || "", setActiveChatId: onChatChange ?? (() => {}) }}
     >
+      <DealRegistrationPromptProvider
+        value={{
+          promptKey: dealRegistrationPromptKey,
+          deliveredPromptKey: dealRegistrationDeliveredKey,
+          markDealPromptDelivered,
+          requestRegisterDealPrompt,
+        }}
+      >
       <DemoLayoutProviders
         isSlackbotOpen={isSlackbotOpen}
         setIsSlackbotOpen={handleSetSlackbotOpen}
@@ -144,7 +165,8 @@ export function SlackAppShell({
           style={{
             fontFamily:
               '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Lato", sans-serif',
-            backgroundColor: T.colors.globalBg,
+            backgroundColor:
+              topViewMode === "seller" ? "#000000" : T.colors.globalBg,
           }}
         >
           {/* ── Top header ── */}
@@ -324,6 +346,7 @@ export function SlackAppShell({
           </div>
         </div>
       </DemoLayoutProviders>
+      </DealRegistrationPromptProvider>
     </ActiveChatContext.Provider>
   );
 }

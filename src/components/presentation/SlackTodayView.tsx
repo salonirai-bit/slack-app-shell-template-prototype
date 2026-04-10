@@ -642,7 +642,11 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
                                 return [...prev, { action, response }];
                               });
                             }}
-                            className="px-3 py-1.5 text-[12px] font-semibold bg-white border border-gray-400 rounded-lg text-gray-800 hover:bg-gray-50 hover:border-gray-500 shadow-sm transition-all"
+                            className={
+                              action === "Submit 4 deals"
+                                ? "px-3 py-1.5 text-[12px] font-semibold rounded-lg border border-[#007a5a] bg-[#007a5a] text-white shadow-sm transition-all hover:bg-[#00684c] hover:border-[#00684c]"
+                                : "px-3 py-1.5 text-[12px] font-semibold bg-white border border-gray-400 rounded-lg text-gray-800 hover:bg-gray-50 hover:border-gray-500 shadow-sm transition-all"
+                            }
                           >
                             {action}
                           </button>
