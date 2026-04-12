@@ -75,7 +75,7 @@ export const UniversalMessageInput = ({ placeholder = "Message...", onSendMessag
             <button 
               type="button"
               onClick={() => { if(text.trim()) { onSendMessage(text.trim()); setText(''); } }}
-              className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${text.trim() ? 'bg-[#007a5a] text-white' : 'text-gray-400 hover:bg-gray-200'}`}
+              className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${text.trim() ? "bg-[var(--shell-cta)] hover:bg-[var(--shell-cta-hover)] text-white" : "text-gray-400 hover:bg-gray-200"}`}
             >
               <Send className="w-4 h-4" />
             </button>

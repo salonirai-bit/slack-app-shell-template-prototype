@@ -17,6 +17,7 @@ import {
   type DemoContext,
 } from "@/app/(demo)/demo/workspace/[workspaceId]/_context/demo-layout-context";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { DealRegistrationPromptProvider } from "@/context/DealRegistrationPromptContext";
 
 const T = SLACK_TOKENS;
@@ -161,7 +162,10 @@ export function SlackAppShell({
         isPresentationMode={true}
       >
         <div
-          className="slack-shell h-full w-full flex flex-col min-h-0 overflow-hidden relative"
+          className={cn(
+            "slack-shell h-full w-full flex flex-col min-h-0 overflow-hidden relative",
+            topViewMode === "seller" && "partner-shell"
+          )}
           style={{
             fontFamily:
               '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Lato", sans-serif',

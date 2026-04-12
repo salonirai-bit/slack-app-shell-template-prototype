@@ -11,6 +11,55 @@ body,
 :root {
   height: 100%;
   min-height: 100vh;
+  /* Channel Manager: Slack greens / blues / purples */
+  --shell-cta: #007a5a;
+  --shell-cta-hover: #00684c;
+  --shell-tab-active: #1264a3;
+  --shell-mrkdwn-link: #1264a3;
+  --shell-block-primary-bg: #611f69;
+  --shell-block-primary-hover: #4a154b;
+  --shell-overlay-icon-bg: #f0e6f6;
+  --shell-today-tab: #611f69;
+  --shell-today-spinner: #611f69;
+  --shell-today-link: #611f69;
+  --shell-today-link-hover-bg: #faf5ff;
+  --shell-today-link-hover-text: #5b21b6;
+  --shell-today-avatar-bg: #f3e8ff;
+  --shell-today-avatar-text: #6b21a8;
+  --shell-agenda-bar: #a855f7;
+  --shell-files-nav-active: #5c2c5d;
+  --shell-dm-item-active: #5c2c5d;
+  --shell-file-dot: #c084fc;
+  --shell-sidebar-accent-blue: #60a5fa;
+  --shell-badge-tonal-bg: #eef2ff;
+  --shell-badge-tonal-text: #4f46e5;
+  --shell-checkbox-accent: #1f7bb6;
+}
+
+/* Partner View: neutrals only; whites / near-whites stay on components */
+.partner-chrome {
+  --shell-cta: #262626;
+  --shell-cta-hover: #404040;
+  --shell-tab-active: #171717;
+  --shell-mrkdwn-link: #525252;
+  --shell-block-primary-bg: #262626;
+  --shell-block-primary-hover: #404040;
+  --shell-overlay-icon-bg: #e8e8e8;
+  --shell-today-tab: #171717;
+  --shell-today-spinner: #404040;
+  --shell-today-link: #525252;
+  --shell-today-link-hover-bg: #f5f5f5;
+  --shell-today-link-hover-text: #262626;
+  --shell-today-avatar-bg: #f5f5f5;
+  --shell-today-avatar-text: #404040;
+  --shell-agenda-bar: #737373;
+  --shell-files-nav-active: #262626;
+  --shell-dm-item-active: #262626;
+  --shell-file-dot: #737373;
+  --shell-sidebar-accent-blue: #737373;
+  --shell-badge-tonal-bg: #f5f5f5;
+  --shell-badge-tonal-text: #404040;
+  --shell-checkbox-accent: #525252;
 }
 
 body {

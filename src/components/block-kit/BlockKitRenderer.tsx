@@ -122,7 +122,7 @@ function renderMrkdwn(text: string) {
       const name = part.slice(2, -1);
       const avatarUrl = getMessageAvatarUrl(name);
       return (
-        <span key={i} className="inline-flex items-center gap-1 font-semibold" style={{ color: '#1264a3' }}>
+        <span key={i} className="inline-flex items-center gap-1 font-semibold" style={{ color: "var(--shell-mrkdwn-link)" }}>
           {avatarUrl && (
             <Image
               src={avatarUrl}
@@ -161,7 +161,7 @@ function renderMrkdwn(text: string) {
         }
         
         return (
-          <a key={i} href={url} className="underline" style={{ color: '#1264a3' }} target="_blank" rel="noopener noreferrer">
+          <a key={i} href={url} className="underline" style={{ color: "var(--shell-mrkdwn-link)" }} target="_blank" rel="noopener noreferrer">
             {linkText}
           </a>
         );
@@ -288,8 +288,8 @@ function Block({ block, onAction }: { block: SlackBlock; onAction?: (actionId: s
                 type="button"
                 onClick={() => el.action_id && onAction?.(el.action_id)}
                 className={`px-4 py-2 text-sm font-medium border transition-colors flex items-center gap-2 ${
-                  isPrimary 
-                    ? "bg-[#611f69] border-[#611f69] text-white hover:bg-[#4a154b]" 
+                  isPrimary
+                    ? "bg-[var(--shell-block-primary-bg)] border-[var(--shell-block-primary-bg)] text-white hover:bg-[var(--shell-block-primary-hover)] hover:border-[var(--shell-block-primary-hover)]"
                     : "bg-white border-gray-300 hover:bg-gray-50"
                 }`}
                 style={{

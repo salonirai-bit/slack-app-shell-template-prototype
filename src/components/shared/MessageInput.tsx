@@ -162,7 +162,7 @@ export function MessageInput({
                     }
                   }
                 }}
-                className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${input.trim() ? 'bg-[#007a5a] text-white' : 'text-gray-400 hover:bg-gray-200'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${input.trim() ? "bg-[var(--shell-cta)] hover:bg-[var(--shell-cta-hover)] text-white" : "text-gray-400 hover:bg-gray-200"}`}
                 title="Send"
               >
                 <Send className="w-4 h-4" />

@@ -18,6 +18,7 @@ import {
   TemplatePartnerCampaignsView,
 } from "@/components/presentation/TemplateViews";
 import type { NavView } from "@/app/(demo)/demo/workspace/[workspaceId]/_context/demo-layout-context";
+import { cn } from "@/lib/utils";
 
 const DEFAULT_CHAT: Record<string, string> = {
   home: "general",
@@ -111,39 +112,47 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col w-screen h-screen overflow-hidden">
+    <div
+      className={cn(
+        "flex flex-col w-screen h-screen overflow-hidden",
+        activeTopView === "seller" && "partner-chrome"
+      )}
+    >
       <div className="h-12 shrink-0 bg-[#1f1f23] border-b border-white/10 px-4 flex items-center">
         <div className="inline-flex items-center rounded-md bg-white/10 p-1">
           <button
             type="button"
             onClick={() => setActiveTopView("admin")}
-            className={`px-3 py-1.5 text-[13px] rounded-md transition-colors ${
+            className={cn(
+              "px-3 py-1.5 text-[13px] rounded-md transition-colors",
               activeTopView === "admin"
-                ? "bg-[#007a5a] text-white font-semibold"
+                ? "bg-[var(--shell-cta)] text-white font-semibold"
                 : "text-white/80 hover:text-white hover:bg-white/10"
-            }`}
+            )}
           >
             Admin
           </button>
           <button
             type="button"
             onClick={() => setActiveTopView("channel-manager")}
-            className={`px-3 py-1.5 text-[13px] rounded-md transition-colors ${
+            className={cn(
+              "px-3 py-1.5 text-[13px] rounded-md transition-colors",
               activeTopView === "channel-manager"
-                ? "bg-[#007a5a] text-white font-semibold"
+                ? "bg-[var(--shell-cta)] text-white font-semibold"
                 : "text-white/80 hover:text-white hover:bg-white/10"
-            }`}
+            )}
           >
             Channel Manager
           </button>
           <button
             type="button"
             onClick={() => setActiveTopView("seller")}
-            className={`px-3 py-1.5 text-[13px] rounded-md transition-colors ${
+            className={cn(
+              "px-3 py-1.5 text-[13px] rounded-md transition-colors",
               activeTopView === "seller"
-                ? "bg-[#007a5a] text-white font-semibold"
+                ? "bg-[var(--shell-cta)] text-white font-semibold"
                 : "text-white/80 hover:text-white hover:bg-white/10"
-            }`}
+            )}
           >
             Partner View
           </button>

@@ -12,11 +12,8 @@
 
 # next.js
 /.next/
-/out/
-# Build output (local only). /docs/ is kept for GitHub Pages deployment.
-
-# Local design reference files (not required for build)
-/reference/
+/out/  # Build artifacts (local only)
+# /docs/ - NOT ignored: required for GitHub Pages deployment
 
 # production
 /build

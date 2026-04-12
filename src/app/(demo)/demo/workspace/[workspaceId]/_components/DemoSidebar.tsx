@@ -492,7 +492,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
           <div className="mb-4">
             <div className="px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group">
               <span className="w-4 h-4 mr-1 flex items-center justify-center text-xs">⌄</span>
-              <span className="w-3.5 h-3.5 mr-2 rounded-full border-2 border-dashed border-blue-400"></span> S-M-S
+              <span className="w-3.5 h-3.5 mr-2 rounded-full border-2 border-dashed border-[var(--shell-sidebar-accent-blue)]"></span> S-M-S
             </div>
             <button className="w-full flex items-center px-4 py-1 pl-9 hover:bg-white/5 text-[15px] text-white font-bold">
               <LockIcon className="w-3 h-3 mr-2 opacity-70" /> proj-hush-contact-insights-ai-...
@@ -509,7 +509,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
           <div className="mb-4">
             <div className="px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group">
               <span className="w-4 h-4 mr-1 flex items-center justify-center text-xs">⌄</span>
-              <span className="w-3 h-3 mr-2 rounded bg-blue-500"></span> Agentforce
+              <span className="w-3 h-3 mr-2 rounded bg-[var(--shell-sidebar-accent-blue)]"></span> Agentforce
             </div>
             <button className="w-full flex items-center px-4 py-1 pl-9 hover:bg-white/5 text-[15px] text-[#D1C2D0]">
               <img src={assetPath("/Salesforce.png")} alt="channel" className="w-3.5 h-3.5 mr-2 object-contain opacity-70 grayscale" /> ai-club
@@ -571,7 +571,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
         <div className="flex-1 overflow-y-auto py-3 custom-scrollbar bg-[#1f1f23]">
           {/* Nav items */}
           <div className="space-y-0.5 mb-5 px-2">
-            <button className="w-full flex items-center px-3 py-1.5 rounded-md bg-[#5c2c5d] text-white text-[14px] font-bold">
+            <button className="w-full flex items-center px-3 py-1.5 rounded-md bg-[var(--shell-files-nav-active)] text-white text-[14px] font-bold">
               All files
             </button>
             <button className="w-full flex items-center px-3 py-1.5 rounded-md hover:bg-white/5 text-[14px] text-[#D1C2D0]">
@@ -595,7 +595,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                 key={i}
                 className="w-full flex items-center gap-2 px-4 py-1 hover:bg-white/5 text-[13px] text-[#D1C2D0] truncate"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-[var(--shell-file-dot)]" />
                 <span className="truncate">{f}</span>
               </button>
             ))}
@@ -617,7 +617,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                     isBold ? "text-white font-bold" : "text-[#D1C2D0]"
                   )}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0" />
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-[var(--shell-file-dot)]" />
                   <span className="truncate">{name}</span>
                 </button>
               );
@@ -887,11 +887,11 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
             }
           };
           
-          // Dense modern Slack-style DM button: flush edges, two-line layout, #5c2c5d active state
+          // Dense modern Slack-style DM button: flush edges, two-line layout; active uses --shell-dm-item-active
           const buttonClassName = cn(
             "w-full flex items-start px-4 py-2 cursor-pointer select-none caret-transparent outline-none focus:outline-none transition-colors group text-left",
             isActive 
-              ? "bg-[#5c2c5d] text-white" 
+              ? "bg-[var(--shell-dm-item-active)] text-white" 
               : "text-[#D1C2D0] hover:bg-white/5"
           );
           const buttonStyle = showDivider ? { borderBottom: "1px solid rgba(255,255,255,0.06)" } : {};

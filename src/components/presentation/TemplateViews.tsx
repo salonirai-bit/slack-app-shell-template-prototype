@@ -272,7 +272,7 @@ export function TemplateFilesView() {
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-[22px] font-bold text-gray-900">All files</h1>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#007a5a] text-white text-[13px] font-bold rounded-lg hover:bg-[#006a4e] transition-colors">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--shell-cta)] text-white text-[13px] font-bold rounded-lg hover:bg-[var(--shell-cta-hover)] transition-colors">
               + New
             </button>
           </div>
@@ -543,7 +543,7 @@ const LEAD_ROWS: LeadRecord[] = [
 ];
 
 function statusPillClass(status: LeadRecord["status"]) {
-  if (status === "New") return "bg-[#eef2ff] text-[#4f46e5]";
+  if (status === "New") return "bg-[var(--shell-badge-tonal-bg)] text-[var(--shell-badge-tonal-text)]";
   if (status === "Working") return "bg-[#f3e8ff] text-[#7e22ce]";
   if (status === "Qualified") return "bg-[#fff3e0] text-[#b45309]";
   return "bg-[#f3f4f6] text-[#4b5563]";
@@ -601,7 +601,7 @@ function stagePillClassForOpp(stage: OpportunityStage) {
   if (stage === "Closed Won") return "bg-emerald-100 text-emerald-800";
   if (stage === "Negotiation") return "bg-orange-100 text-orange-800";
   if (stage === "Proposal") return "bg-amber-100 text-amber-900";
-  if (stage === "Qualification") return "bg-[#eef2ff] text-[#4f46e5]";
+  if (stage === "Qualification") return "bg-[var(--shell-badge-tonal-bg)] text-[var(--shell-badge-tonal-text)]";
   if (stage === "Discovery") return "bg-[#f3f4f6] text-[#4b5563]";
   return "bg-purple-100 text-purple-800";
 }
@@ -619,7 +619,7 @@ export function TemplatePartnerLeadsView() {
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-[#1f2937]" />
             <h1 className="text-[22px] font-bold text-[#1f2937]">My Open Leads</h1>
-            <span className="text-[12px] font-semibold text-[#4f46e5] bg-[#eef2ff] rounded-md px-2 py-0.5">
+            <span className="text-[12px] font-semibold text-[var(--shell-badge-tonal-text)] bg-[var(--shell-badge-tonal-bg)] rounded-md px-2 py-0.5">
               Leads
             </span>
           </div>
@@ -646,7 +646,7 @@ export function TemplatePartnerLeadsView() {
         </div>
         <button
           type="button"
-          className="h-8 shrink-0 px-3 rounded-md text-[13px] font-semibold bg-[#007a5a] text-white border border-[#007a5a] hover:bg-[#00684c] hover:border-[#00684c] shadow-sm"
+          className="h-8 shrink-0 px-3 rounded-md text-[13px] font-semibold bg-[var(--shell-cta)] text-white border border-[var(--shell-cta)] hover:bg-[var(--shell-cta-hover)] hover:border-[var(--shell-cta-hover)] shadow-sm"
         >
           Add a lead
         </button>
@@ -966,7 +966,7 @@ export function TemplateLeadsView() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100">View details</button>
-                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[#007a5a] text-white hover:bg-[#006c4f]">Approve</button>
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[var(--shell-cta)] text-white hover:bg-[var(--shell-cta-hover)]">Approve</button>
                     </div>
                   </td>
                 </tr>
@@ -1000,7 +1000,7 @@ export function TemplateLeadsView() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100">View details</button>
-                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[#007a5a] text-white hover:bg-[#006c4f]">Approve</button>
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[var(--shell-cta)] text-white hover:bg-[var(--shell-cta-hover)]">Approve</button>
                     </div>
                   </td>
                 </tr>
@@ -1034,7 +1034,7 @@ export function TemplateLeadsView() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100">View details</button>
-                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[#007a5a] text-white hover:bg-[#006c4f]">Approve</button>
+                      <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[var(--shell-cta)] text-white hover:bg-[var(--shell-cta-hover)]">Approve</button>
                     </div>
                   </td>
                 </tr>
@@ -1099,7 +1099,7 @@ function PartnerPageShell({
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-2">
                     <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] border border-gray-300 text-gray-700 hover:bg-gray-100">View details</button>
-                    <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[#007a5a] text-white hover:bg-[#006c4f]">Approve</button>
+                    <button type="button" className="px-2.5 py-1.5 rounded-md text-[12px] font-semibold bg-[var(--shell-cta)] text-white hover:bg-[var(--shell-cta-hover)]">Approve</button>
                   </div>
                 </td>
               </tr>
@@ -1145,7 +1145,7 @@ export function TemplatePartnerOpportunityView() {
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-[#1f2937]" />
             <h1 className="text-[22px] font-bold text-[#1f2937]">My Open Opportunities</h1>
-            <span className="text-[12px] font-semibold text-[#4f46e5] bg-[#eef2ff] rounded-md px-2 py-0.5">
+            <span className="text-[12px] font-semibold text-[var(--shell-badge-tonal-text)] bg-[var(--shell-badge-tonal-bg)] rounded-md px-2 py-0.5">
               Opportunities
             </span>
           </div>
@@ -1173,7 +1173,7 @@ export function TemplatePartnerOpportunityView() {
         <button
           type="button"
           onClick={() => requestRegisterDealPrompt()}
-          className="h-8 shrink-0 px-3 rounded-md text-[13px] font-semibold bg-[#007a5a] text-white border border-[#007a5a] hover:bg-[#00684c] hover:border-[#00684c] shadow-sm"
+          className="h-8 shrink-0 px-3 rounded-md text-[13px] font-semibold bg-[var(--shell-cta)] text-white border border-[var(--shell-cta)] hover:bg-[var(--shell-cta-hover)] hover:border-[var(--shell-cta-hover)] shadow-sm"
         >
           Register a new deal
         </button>
@@ -1474,7 +1474,7 @@ export function TemplateRevenueCommandCenter() {
           <h1 className="text-[20px] font-bold text-gray-900">Revenue command center</h1>
           <p className="text-[13px] text-gray-500 mt-0.5">Plan today, unblock risks, and move deals faster.</p>
         </div>
-        <button className="px-3 py-1.5 text-[13px] font-semibold rounded-lg bg-[#007a5a] text-white hover:bg-[#006a4e] transition-colors">
+        <button className="px-3 py-1.5 text-[13px] font-semibold rounded-lg bg-[var(--shell-cta)] text-white hover:bg-[var(--shell-cta-hover)] transition-colors">
           Start standup
         </button>
       </div>

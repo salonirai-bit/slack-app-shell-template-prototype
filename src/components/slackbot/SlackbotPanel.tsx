@@ -92,7 +92,15 @@ export function SlackbotPanel({ onClose, panelData, history = [], onUpdateHistor
             "px-3 py-2.5 font-medium transition-colors",
             activeTab === "messages" ? "border-b-2" : "hover:text-[#1d1c1d]"
           )}
-          style={activeTab === "messages" ? { color: T.colors.link, borderBottomColor: T.colors.link, fontSize: T.typography.small } : { color: T.colors.textSecondary, fontSize: T.typography.small }}
+          style={
+            activeTab === "messages"
+              ? {
+                  color: "var(--shell-tab-active)",
+                  borderBottomColor: "var(--shell-tab-active)",
+                  fontSize: T.typography.small,
+                }
+              : { color: T.colors.textSecondary, fontSize: T.typography.small }
+          }
         >
           Messages
         </button>
@@ -103,7 +111,15 @@ export function SlackbotPanel({ onClose, panelData, history = [], onUpdateHistor
             "px-3 py-2.5 font-medium transition-colors",
             activeTab === "history" ? "border-b-2" : "hover:text-[#1d1c1d]"
           )}
-          style={activeTab === "history" ? { color: T.colors.link, borderBottomColor: T.colors.link, fontSize: T.typography.small } : { color: T.colors.textSecondary, fontSize: T.typography.small }}
+          style={
+            activeTab === "history"
+              ? {
+                  color: "var(--shell-tab-active)",
+                  borderBottomColor: "var(--shell-tab-active)",
+                  fontSize: T.typography.small,
+                }
+              : { color: T.colors.textSecondary, fontSize: T.typography.small }
+          }
         >
           History
         </button>
@@ -114,7 +130,15 @@ export function SlackbotPanel({ onClose, panelData, history = [], onUpdateHistor
             "px-3 py-2.5 font-medium transition-colors",
             activeTab === "files" ? "border-b-2" : "hover:text-[#1d1c1d]"
           )}
-          style={activeTab === "files" ? { color: T.colors.link, borderBottomColor: T.colors.link, fontSize: T.typography.small } : { color: T.colors.textSecondary, fontSize: T.typography.small }}
+          style={
+            activeTab === "files"
+              ? {
+                  color: "var(--shell-tab-active)",
+                  borderBottomColor: "var(--shell-tab-active)",
+                  fontSize: T.typography.small,
+                }
+              : { color: T.colors.textSecondary, fontSize: T.typography.small }
+          }
         >
           Files
         </button>

@@ -349,7 +349,7 @@ function MoreOverlay() {
         onMouseEnter={() => setT1(true)}
         onMouseLeave={() => setT1(false)}
       >
-        <div style={{ width: 44, height: 44, borderRadius: 10, background: "#f0e6f6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 10, background: "var(--shell-overlay-icon-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
           🔧
         </div>
         <div>
@@ -364,7 +364,7 @@ function MoreOverlay() {
         onMouseEnter={() => setT2(true)}
         onMouseLeave={() => setT2(false)}
       >
-        <span style={{ fontSize: 14, color: "#1264a3", fontWeight: 500 }}>Customize navigation bar</span>
+        <span style={{ fontSize: 14, color: "var(--shell-mrkdwn-link)", fontWeight: 500 }}>Customize navigation bar</span>
       </div>
     </div>
   );

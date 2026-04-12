@@ -451,7 +451,7 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-2 outline-none transition-colors ${activeTab === tab ? "text-[#611f69] border-b-2 border-[#611f69]" : "hover:text-gray-800"}`}
+              className={`pb-2 outline-none transition-colors ${activeTab === tab ? "text-[var(--shell-today-tab)] border-b-2 border-[var(--shell-today-tab)]" : "hover:text-gray-800"}`}
             >
               {tab}
             </button>
@@ -467,7 +467,7 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
           {/* Step 1: user message */}
           {generationStep >= 1 && (
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded bg-purple-100 flex items-center justify-center text-[11px] font-bold text-purple-700 flex-shrink-0">RC</div>
+              <div className="w-8 h-8 rounded flex items-center justify-center text-[11px] font-bold flex-shrink-0 bg-[var(--shell-today-avatar-bg)] text-[var(--shell-today-avatar-text)]">RC</div>
               <div className="flex-1 min-w-0">
                 <div className="text-[13px] font-bold text-gray-900">
                   Rita Chen <span className="text-gray-400 font-normal text-[11px] ml-1">Just now</span>
@@ -517,7 +517,7 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
                       <span className="truncate">{script.toolName}</span>
                     </div>
                     {generationStep === 3 ? (
-                      <div className="w-3.5 h-3.5 rounded-full border-2 border-gray-200 border-t-[#611f69] animate-spin flex-shrink-0 ml-2" />
+                      <div className="w-3.5 h-3.5 rounded-full border-2 border-gray-200 border-t-[var(--shell-today-spinner)] animate-spin flex-shrink-0 ml-2" />
                     ) : (
                       <span className="text-[11px] text-gray-400 flex-shrink-0 ml-2">3 results ⌄</span>
                     )}
@@ -592,15 +592,15 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
                                 <label className="block text-[12px] text-gray-700 mb-1.5">Notify me when</label>
                                 <div className="rounded-xl border border-gray-300 bg-white p-3 space-y-2">
                                   <label className="flex items-start gap-2 text-[13px] text-gray-800">
-                                    <input type="checkbox" checked={notifyNewDeal} onChange={() => setNotifyNewDeal((v) => !v)} className="mt-0.5 w-4 h-4 accent-[#1f7bb6]" />
+                                    <input type="checkbox" checked={notifyNewDeal} onChange={() => setNotifyNewDeal((v) => !v)} className="mt-0.5 w-4 h-4 accent-[var(--shell-checkbox-accent)]" />
                                     <span>A new deal is registered by any partner</span>
                                   </label>
                                   <label className="flex items-start gap-2 text-[13px] text-gray-800">
-                                    <input type="checkbox" checked={notifyConflict} onChange={() => setNotifyConflict((v) => !v)} className="mt-0.5 w-4 h-4 accent-[#1f7bb6]" />
+                                    <input type="checkbox" checked={notifyConflict} onChange={() => setNotifyConflict((v) => !v)} className="mt-0.5 w-4 h-4 accent-[var(--shell-checkbox-accent)]" />
                                     <span>A conflict is detected and needs my review</span>
                                   </label>
                                   <label className="flex items-start gap-2 text-[13px] text-gray-800">
-                                    <input type="checkbox" checked={notifyStaleDeal} onChange={() => setNotifyStaleDeal((v) => !v)} className="mt-0.5 w-4 h-4 accent-[#1f7bb6]" />
+                                    <input type="checkbox" checked={notifyStaleDeal} onChange={() => setNotifyStaleDeal((v) => !v)} className="mt-0.5 w-4 h-4 accent-[var(--shell-checkbox-accent)]" />
                                     <span>No updates in 30 days on a registered deal</span>
                                   </label>
                                 </div>
@@ -614,7 +614,7 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
                               <button
                                 type="button"
                                 onClick={() => setActiveSetupDetail(null)}
-                                className="flex-1 rounded-xl border border-[#007a5a] bg-[#007a5a] px-3 py-2 text-[13px] font-semibold text-white hover:bg-[#00684c]"
+                                className="flex-1 rounded-xl border border-[var(--shell-cta)] bg-[var(--shell-cta)] px-3 py-2 text-[13px] font-semibold text-white hover:bg-[var(--shell-cta-hover)] hover:border-[var(--shell-cta-hover)]"
                               >
                                 Save and Continue
                               </button>
@@ -644,7 +644,7 @@ export function SlackbotPanel({ panelData, onClose }: SlackbotPanelProps) {
                             }}
                             className={
                               action === "Submit 4 deals"
-                                ? "px-3 py-1.5 text-[12px] font-semibold rounded-lg border border-[#007a5a] bg-[#007a5a] text-white shadow-sm transition-all hover:bg-[#00684c] hover:border-[#00684c]"
+                                ? "px-3 py-1.5 text-[12px] font-semibold rounded-lg border border-[var(--shell-cta)] bg-[var(--shell-cta)] text-white shadow-sm transition-all hover:bg-[var(--shell-cta-hover)] hover:border-[var(--shell-cta-hover)]"
                                 : "px-3 py-1.5 text-[12px] font-semibold bg-white border border-gray-400 rounded-lg text-gray-800 hover:bg-gray-50 hover:border-gray-500 shadow-sm transition-all"
                             }
                           >
@@ -1295,7 +1295,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     <div className="mt-3 pt-3" style={{ borderTop: "1px solid #F3F4F6" }}>
                       <button
                         onClick={(e) => { e.stopPropagation(); onNavigateToActivity(); }}
-                        className="w-full text-center text-[13px] font-semibold text-[#611f69] hover:text-purple-800 hover:bg-purple-50 py-1.5 rounded-lg transition-colors"
+                        className="w-full text-center text-[13px] font-semibold text-[var(--shell-today-link)] hover:text-[var(--shell-today-link-hover-text)] hover:bg-[var(--shell-today-link-hover-bg)] py-1.5 rounded-lg transition-colors"
                       >
                         View Activity →
                       </button>
@@ -1358,7 +1358,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     <div className="mt-3 pt-3" style={{ borderTop: "1px solid #F3F4F6" }}>
                       <button
                         onClick={(e) => { e.stopPropagation(); onNavigateToActivity(); }}
-                        className="w-full text-center text-[13px] font-semibold text-[#611f69] hover:text-purple-800 hover:bg-purple-50 py-1.5 rounded-lg transition-colors"
+                        className="w-full text-center text-[13px] font-semibold text-[var(--shell-today-link)] hover:text-[var(--shell-today-link-hover-text)] hover:bg-[var(--shell-today-link-hover-bg)] py-1.5 rounded-lg transition-colors"
                       >
                         View Activity →
                       </button>
@@ -1468,7 +1468,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     subtitle="Champion: Priya Shah"
                     dotColor="bg-orange-500"
                     time="11:30am"
-                    barColor="bg-purple-500"
+                    barColor="bg-[var(--shell-agenda-bar)]"
                     icon={MeetIcon}
                     isMeeting
                     onPrep={() => openPrep("deal-acme", "11:30am")}
@@ -1527,7 +1527,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     <div className="mt-3 space-y-2 opacity-60 pointer-events-none">
                       <AgendaItem title="Pipeline Review" subtitle="Q1 week 1 forecast" time="9:00am" barColor="bg-blue-500" icon={MeetIcon} isMeeting onPrep={() => {}} />
                       <AgendaItem title="Greentech SOW Review" subtitle="SOW v2 with Diane" dotColor="bg-emerald-500" time="2:00pm" barColor="bg-emerald-500" icon={CalIcon} onPrep={() => {}} />
-                      <AgendaItem title="Acme Corp Follow-up" subtitle="Exec path with Priya" dotColor="bg-orange-500" time="4:30pm" barColor="bg-purple-500" icon={MeetIcon} isMeeting onPrep={() => {}} />
+                      <AgendaItem title="Acme Corp Follow-up" subtitle="Exec path with Priya" dotColor="bg-orange-500" time="4:30pm" barColor="bg-[var(--shell-agenda-bar)]" icon={MeetIcon} isMeeting onPrep={() => {}} />
                     </div>
                   )}
                 </div>
