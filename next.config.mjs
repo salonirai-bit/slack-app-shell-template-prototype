@@ -1,12 +1,21 @@
 /** @type {import('next').NextConfig} */
-// GitHub Pages needs basePath; `output: 'export'` + basePath breaks `next dev` routing (404 on all pages).
-const publishBasePath = "/slack-vision-partner-cloud";
+// GitHub Pages needs a subpath. Dev server must stay at `/` (basePath breaks `next dev`).
+//
+// • Default `npm run build`: assets use `/slack-vision-partner-cloud/...`
+//   → `next start`: open http://localhost:3000/slack-vision-partner-cloud
+//   → static `out/`: serve so that URL path matches (or use build:local).
+// • Local static preview at site root: `npm run build:local` then `npm run preview:local`
+//   (sets BASE_PATH= so links are `/ _next/...`).
 const isDev = process.env.NODE_ENV === "development";
+const publishBasePath =
+  process.env.BASE_PATH !== undefined
+    ? String(process.env.BASE_PATH).trim() || ""
+    : "/slack-vision-partner-cloud";
 
 const nextConfig = {
-    // Enable static export for GitHub Pages (GitSoma)
-    // Comment out 'output: export' if deploying to Vercel/Netlify
-    output: 'export',
+    // Static export only for production `next build` (GitHub Pages / `out`).
+    // Keeping it off during `next dev` avoids dev-server 404s and routing bugs with App Router + export.
+    ...(isDev ? {} : { output: "export" }),
     
     eslint: {
         ignoreDuringBuilds: true,
@@ -23,8 +32,8 @@ const nextConfig = {
             { protocol: "https", hostname: "ui-avatars.com", pathname: "/**" },
         ],
     },
-    // Production / `next build`: GitSoma Pages. Local dev: serve at /
-    ...(isDev
+    // Production / `next build`: optional subpath (empty BASE_PATH = site root).
+    ...(isDev || !publishBasePath
         ? {}
         : {
               basePath: publishBasePath,

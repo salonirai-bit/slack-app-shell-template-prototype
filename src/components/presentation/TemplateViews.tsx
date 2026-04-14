@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { UniversalChatSurface } from "@/components/shared/UniversalChatSurface";
 import { ChatMessage } from "@/components/shared/ChatMessage";
-import { ChevronRight, Search, Star, MoreVertical, ChevronDown } from "lucide-react";
+import { ChevronRight, Search, Star, MoreVertical, ChevronDown, Plus, Megaphone } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { useDealRegistrationPrompt } from "@/context/DealRegistrationPromptContext";
 import { getAvatarUrl } from "@/context/DemoDataContext";
@@ -677,6 +677,137 @@ const OPPORTUNITY_ROWS: OpportunityRecord[] = [
   { id: "O-8720", name: "DataTek Applications Upgrade", account: "DataTek Applications", amount: "$88,000", stage: "Closed Won", closeDate: "Feb 14, 2026", owner: "Aisha Raman", probability: "100%", type: "Upgrade", partner: "CloudWave Systems" },
 ];
 
+type PartnerContactRecord = {
+  id: string;
+  name: string;
+  title: string;
+  account: string;
+  email: string;
+  phone: string;
+  partner: string;
+  lastActivity: string;
+  status: "Active" | "Pending" | "Nurture" | "Champion";
+};
+
+const PARTNER_CONTACT_ROWS: PartnerContactRecord[] = [
+  { id: "C-9041", name: "Mira Patel", title: "Partner Manager", account: "Acme Corp", email: "mira.patel@acme.com", phone: "+1 415-555-0142", partner: "CloudWave Systems", lastActivity: "Today", status: "Champion" },
+  { id: "C-9038", name: "Jon Park", title: "Alliance Director", account: "Greentech", email: "jon.park@greentech.io", phone: "+1 212-555-0198", partner: "Vertex Alliance", lastActivity: "Today", status: "Active" },
+  { id: "C-9032", name: "Rhea Thomas", title: "Campaign Lead", account: "Sporty Nation", email: "rhea.thomas@sporty.co", phone: "+44 20 7946 0958", partner: "Northstar Digital", lastActivity: "Yesterday", status: "Nurture" },
+  { id: "C-9027", name: "Daniel Kim", title: "VP Procurement", account: "Acme Corp", email: "daniel.kim@acme.com", phone: "+1 415-555-0167", partner: "Vertex Alliance", lastActivity: "2h ago", status: "Active" },
+  { id: "C-9021", name: "Priya Shah", title: "Champion", account: "Acme Corp", email: "priya.shah@acme.com", phone: "+1 415-555-0103", partner: "CloudWave Systems", lastActivity: "3h ago", status: "Champion" },
+  { id: "C-9015", name: "Jordan Hayes", title: "Solutions Architect", account: "TechStart", email: "jordan@techstart.dev", phone: "+1 650-555-0134", partner: "BluePeak Tech", lastActivity: "Yesterday", status: "Active" },
+  { id: "C-9009", name: "Dana Torres", title: "Implementation PM", account: "Runners Club", email: "dana@runnersclub.org", phone: "+1 617-555-0189", partner: "CloudWave Systems", lastActivity: "Today", status: "Active" },
+  { id: "C-9003", name: "Lisa Park", title: "RevOps Lead", account: "TechStart", email: "lisa.park@techstart.dev", phone: "+1 650-555-0171", partner: "BluePeak Tech", lastActivity: "4h ago", status: "Pending" },
+  { id: "C-8996", name: "Mike Torres", title: "Digital VP", account: "Sporty Nation", email: "mike.torres@sporty.co", phone: "+1 312-555-0120", partner: "Northstar Digital", lastActivity: "1d ago", status: "Nurture" },
+  { id: "C-8990", name: "Sarah Chen", title: "Sales Director", account: "Internal", email: "sarah.chen@example.com", phone: "+1 415-555-0100", partner: "CloudWave Systems", lastActivity: "Today", status: "Active" },
+  { id: "C-8984", name: "Marcus Lee", title: "Account Exec", account: "Sporty Nation", email: "marcus.lee@example.com", phone: "+1 415-555-0144", partner: "Northstar Digital", lastActivity: "2d ago", status: "Pending" },
+  { id: "C-8978", name: "Elena Moss", title: "Clinical IT", account: "Vertex BioLabs", email: "elena.moss@vertexbio.com", phone: "+1 919-555-0165", partner: "CloudWave Systems", lastActivity: "5h ago", status: "Active" },
+  { id: "C-8971", name: "Harper Sloan", title: "COO", account: "Summit Health Works", email: "harper@summithealth.health", phone: "+1 801-555-0191", partner: "BluePeak Tech", lastActivity: "Yesterday", status: "Champion" },
+  { id: "C-8965", name: "Chris Park", title: "Procurement", account: "Sporty Nation", email: "chris.park@sporty.co", phone: "+1 312-555-0180", partner: "Northstar Digital", lastActivity: "6d ago", status: "Nurture" },
+];
+
+type PartnerAccountRecord = {
+  id: string;
+  name: string;
+  partner: string;
+  region: string;
+  industry: string;
+  revenue: string;
+  owner: string;
+  tier: "Gold" | "Silver" | "Registered";
+  employees: string;
+};
+
+const PARTNER_ACCOUNT_ROWS: PartnerAccountRecord[] = [
+  { id: "A-7721", name: "Acme Corp", partner: "CloudWave Systems", region: "NAMER", industry: "Manufacturing", revenue: "$420M", owner: "Aisha Raman", tier: "Gold", employees: "3,200" },
+  { id: "A-7715", name: "Greentech", partner: "Vertex Alliance", region: "EMEA", industry: "Clean Energy", revenue: "$180M", owner: "Noah Kim", tier: "Gold", employees: "890" },
+  { id: "A-7709", name: "Sporty Nation", partner: "Northstar Digital", region: "NAMER", industry: "Retail", revenue: "$95M", owner: "Caleb Stone", tier: "Silver", employees: "1,100" },
+  { id: "A-7702", name: "TechStart", partner: "BluePeak Tech", region: "APAC", industry: "Software", revenue: "$62M", owner: "Aisha Raman", tier: "Silver", employees: "410" },
+  { id: "A-7696", name: "Runners Club", partner: "CloudWave Systems", region: "NAMER", industry: "Nonprofit", revenue: "$28M", owner: "Rita Patel", tier: "Gold", employees: "220" },
+  { id: "A-7689", name: "Vertex BioLabs", partner: "CloudWave Systems", region: "NAMER", industry: "Life Sciences", revenue: "$310M", owner: "Noah Kim", tier: "Gold", employees: "2,400" },
+  { id: "A-7682", name: "Summit Health Works", partner: "BluePeak Tech", region: "NAMER", industry: "Healthcare", revenue: "$540M", owner: "Caleb Stone", tier: "Gold", employees: "6,100" },
+  { id: "A-7675", name: "Orbit Commerce", partner: "Vertex Alliance", region: "EMEA", industry: "E-commerce", revenue: "$74M", owner: "Noah Kim", tier: "Silver", employees: "520" },
+  { id: "A-7668", name: "Cardinal Distributing", partner: "Northstar Digital", region: "NAMER", industry: "Logistics", revenue: "$210M", owner: "Caleb Stone", tier: "Gold", employees: "1,850" },
+  { id: "A-7661", name: "Williams Plumbing", partner: "Vertex Alliance", region: "NAMER", industry: "Field Service", revenue: "$44M", owner: "Noah Kim", tier: "Silver", employees: "380" },
+  { id: "A-7654", name: "Northline Logistics", partner: "CloudWave Systems", region: "NAMER", industry: "Transportation", revenue: "$1.1B", owner: "Prantik Banerjee", tier: "Gold", employees: "12,000" },
+  { id: "A-7648", name: "Sable Security", partner: "Northstar Digital", region: "NAMER", industry: "Security", revenue: "$132M", owner: "Caleb Stone", tier: "Silver", employees: "670" },
+  { id: "A-7641", name: "Crestline Partners", partner: "CloudWave Systems", region: "EMEA", industry: "Professional Svcs", revenue: "$58M", owner: "Aisha Raman", tier: "Registered", employees: "290" },
+  { id: "A-7635", name: "Flextech, Inc.", partner: "Vertex Alliance", region: "APAC", industry: "High Tech", revenue: "$390M", owner: "Noah Kim", tier: "Gold", employees: "2,100" },
+];
+
+function partnerContactStatusPillClass(status: PartnerContactRecord["status"]) {
+  if (status === "Champion") return "bg-emerald-100 text-emerald-800";
+  if (status === "Active") return "bg-[var(--shell-badge-tonal-bg)] text-[var(--shell-badge-tonal-text)]";
+  if (status === "Pending") return "bg-amber-100 text-amber-900";
+  return "bg-[#f3f4f6] text-[#4b5563]";
+}
+
+function partnerAccountTierPillClass(tier: PartnerAccountRecord["tier"]) {
+  if (tier === "Gold") return "bg-amber-100 text-amber-900";
+  if (tier === "Silver") return "bg-[#f3f4f6] text-[#4b5563]";
+  return "bg-[#e8f4fc] text-[#1264a3]";
+}
+
+function PartnerSfTablePage({
+  title,
+  badge,
+  primaryActionLabel,
+  sortLabel,
+  filterLabel,
+  children,
+}: {
+  title: string;
+  badge: string;
+  primaryActionLabel: string;
+  sortLabel: string;
+  filterLabel: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="h-full flex flex-col overflow-hidden bg-white">
+      <div className="px-6 py-4 border-b border-gray-200 shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Star className="w-4 h-4 text-[#1f2937]" />
+            <h1 className="text-[22px] font-bold text-[#1f2937]">{title}</h1>
+            <span className="text-[12px] font-semibold text-[var(--shell-badge-tonal-text)] bg-[var(--shell-badge-tonal-bg)] rounded-md px-2 py-0.5">
+              {badge}
+            </span>
+          </div>
+          <button type="button" className="text-[13px] text-gray-500 hover:text-gray-700">
+            Share
+          </button>
+        </div>
+      </div>
+
+      <div className="px-6 py-3 border-b border-gray-100 shrink-0 flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
+          <button type="button" className="h-8 px-3 rounded-md border border-gray-300 text-[13px] text-gray-700 hover:bg-gray-50">
+            Edit view
+          </button>
+          <div className="h-8 w-8 rounded-md border border-gray-300 flex items-center justify-center text-gray-500">
+            <Search className="w-4 h-4" />
+          </div>
+          <button type="button" className="h-8 px-3 rounded-md border border-gray-300 text-[13px] text-gray-700 hover:bg-gray-50">
+            {sortLabel}
+          </button>
+          <button type="button" className="h-8 px-3 rounded-md border border-gray-300 text-[13px] text-gray-700 hover:bg-gray-50">
+            {filterLabel}
+          </button>
+        </div>
+        <button
+          type="button"
+          className="h-8 shrink-0 px-3 rounded-md text-[13px] font-semibold bg-[var(--shell-cta)] text-white border border-[var(--shell-cta)] hover:bg-[var(--shell-cta-hover)] hover:border-[var(--shell-cta-hover)] shadow-sm"
+        >
+          {primaryActionLabel}
+        </button>
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-auto">{children}</div>
+    </div>
+  );
+}
+
 function stagePillClassForOpp(stage: OpportunityStage) {
   if (stage === "Closed Won") return "bg-emerald-100 text-emerald-800";
   if (stage === "Negotiation") return "bg-orange-100 text-orange-800";
@@ -1192,22 +1323,60 @@ function PartnerPageShell({
 }
 
 export function TemplatePartnerContactsView() {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   return (
-    <PartnerPageShell
-      title="Contacts"
-      subtitle="Manage partner contacts awaiting approval and profile updates."
-      meta={[
-        { label: "Pending", value: "14" },
-        { label: "Needs verification", value: "5" },
-        { label: "SLA", value: "24h" },
-      ]}
-      headers={["Contact", "Partner", "Role", "Email", "Status"]}
-      rows={[
-        ["Mira Patel", "CloudWave Systems", "Partner Manager", "mira@cloudwave.io", "Pending"],
-        ["Jon Park", "Vertex Alliance", "Sales Lead", "jon@vertexalliance.com", "Pending"],
-        ["Rhea Thomas", "Northstar Digital", "Campaign Lead", "rhea@northstar.digital", "Review"],
-      ]}
-    />
+    <PartnerSfTablePage
+      title="Partner contacts"
+      badge="Contacts"
+      primaryActionLabel="New contact"
+      sortLabel="Sort: Last activity"
+      filterLabel="Partner is any of"
+    >
+      <table className="w-full text-left">
+        <thead className="sticky top-0 bg-[#fafafa] border-b border-gray-200 z-[1]">
+          <tr className="text-[12px] text-gray-500">
+            <th className="px-6 py-3 font-semibold">Name</th>
+            <th className="px-4 py-3 font-semibold">Title</th>
+            <th className="px-4 py-3 font-semibold">Account</th>
+            <th className="px-4 py-3 font-semibold">Email</th>
+            <th className="px-4 py-3 font-semibold">Phone</th>
+            <th className="px-4 py-3 font-semibold">Partner</th>
+            <th className="px-4 py-3 font-semibold">Last activity</th>
+            <th className="px-4 py-3 font-semibold">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {PARTNER_CONTACT_ROWS.map((row) => (
+            <tr
+              key={row.id}
+              className={`border-b border-gray-100 hover:bg-gray-50 ${selectedId === row.id ? "bg-[#eaf6fb]" : ""}`}
+            >
+              <td className="px-6 py-3 text-[14px] font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(row.id === selectedId ? null : row.id)}
+                  className="text-[#1f4f75] hover:underline text-left"
+                >
+                  {row.name}
+                </button>
+              </td>
+              <td className="px-4 py-3 text-[14px] text-gray-700">{row.title}</td>
+              <td className="px-4 py-3 text-[14px] text-gray-700">{row.account}</td>
+              <td className="px-4 py-3 text-[14px] text-[#1f6f95]">{row.email}</td>
+              <td className="px-4 py-3 text-[14px] text-gray-600 tabular-nums">{row.phone}</td>
+              <td className="px-4 py-3 text-[14px] text-gray-700">{row.partner}</td>
+              <td className="px-4 py-3 text-[14px] text-gray-500">{row.lastActivity}</td>
+              <td className="px-4 py-3">
+                <span className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${partnerContactStatusPillClass(row.status)}`}>
+                  {row.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </PartnerSfTablePage>
   );
 }
 
@@ -1487,42 +1656,247 @@ export function TemplatePartnerOpportunityView() {
 }
 
 export function TemplatePartnerAccountsView() {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   return (
-    <PartnerPageShell
-      title="Accounts"
-      subtitle="Validate account mappings and ownership before go-live."
-      meta={[
-        { label: "Accounts pending", value: "21" },
-        { label: "Duplicates", value: "3" },
-        { label: "Auto-match", value: "82%" },
-      ]}
-      headers={["Account", "Partner", "Region", "Segment", "Owner"]}
-      rows={[
-        ["Acme Corp", "CloudWave Systems", "NAMER", "Enterprise", "Aisha Raman"],
-        ["Greentech", "Vertex Alliance", "EMEA", "Mid-Market", "Noah Kim"],
-        ["TechStart", "BluePeak Tech", "APAC", "Enterprise", "Caleb Stone"],
-      ]}
-    />
+    <PartnerSfTablePage
+      title="Partner accounts"
+      badge="Accounts"
+      primaryActionLabel="Add account"
+      sortLabel="Sort: Account name"
+      filterLabel="Tier is any of"
+    >
+      <table className="w-full text-left">
+        <thead className="sticky top-0 bg-[#fafafa] border-b border-gray-200 z-[1]">
+          <tr className="text-[12px] text-gray-500">
+            <th className="px-6 py-3 font-semibold">Account name</th>
+            <th className="px-4 py-3 font-semibold">Partner</th>
+            <th className="px-4 py-3 font-semibold">Region</th>
+            <th className="px-4 py-3 font-semibold">Industry</th>
+            <th className="px-4 py-3 font-semibold">Annual revenue</th>
+            <th className="px-4 py-3 font-semibold">Employees</th>
+            <th className="px-4 py-3 font-semibold">Owner</th>
+            <th className="px-4 py-3 font-semibold">Tier</th>
+          </tr>
+        </thead>
+        <tbody>
+          {PARTNER_ACCOUNT_ROWS.map((row) => (
+            <tr
+              key={row.id}
+              className={`border-b border-gray-100 hover:bg-gray-50 ${selectedId === row.id ? "bg-[#eaf6fb]" : ""}`}
+            >
+              <td className="px-6 py-3 text-[14px] font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(row.id === selectedId ? null : row.id)}
+                  className="text-[#1f4f75] hover:underline text-left"
+                >
+                  {row.name}
+                </button>
+              </td>
+              <td className="px-4 py-3 text-[14px] text-gray-700">{row.partner}</td>
+              <td className="px-4 py-3 text-[14px] text-gray-700">{row.region}</td>
+              <td className="px-4 py-3 text-[14px] text-gray-700">{row.industry}</td>
+              <td className="px-4 py-3 text-[14px] font-medium text-gray-900">{row.revenue}</td>
+              <td className="px-4 py-3 text-[14px] text-gray-600 tabular-nums">{row.employees}</td>
+              <td className="px-4 py-3 text-[14px] text-gray-700">{row.owner}</td>
+              <td className="px-4 py-3">
+                <span className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${partnerAccountTierPillClass(row.tier)}`}>
+                  {row.tier}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </PartnerSfTablePage>
   );
+}
+
+function SalesforcePrmCloudIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 48 32"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M38.4 20.8H14.1c-4.1 0-7.4-3.3-7.4-7.4 0-3.5 2.4-6.4 5.7-7.2C13 3.1 17.4 0 22.5 0c4.5 0 8.4 2.6 10.3 6.4 1-.3 2.1-.5 3.2-.5 5.6 0 10.2 4.6 10.2 10.2 0 .4 0 .9-.1 1.3 3.1.9 5.4 3.8 5.4 7.2 0 4.2-3.4 7.6-7.6 7.6h-5.5z" />
+    </svg>
+  );
+}
+
+function MdfOutlineButton({ children }: { children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-md text-[12px] font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+    >
+      {children}
+    </button>
+  );
+}
+
+function mdfRequestStatusPillClass(status: "pending" | "approved") {
+  if (status === "pending") return "bg-amber-100 text-amber-900";
+  return "bg-emerald-100 text-emerald-800";
 }
 
 export function TemplatePartnerMdfView() {
   return (
-    <PartnerPageShell
-      title="MDF"
-      subtitle="Approve market development fund requests and campaign budgets."
-      meta={[
-        { label: "Requests", value: "7" },
-        { label: "Budget impact", value: "$86K" },
-        { label: "Over limit", value: "1" },
-      ]}
-      headers={["Request ID", "Partner", "Campaign", "Amount", "Submitted"]}
-      rows={[
-        ["MDF-4421", "CloudWave Systems", "Q2 Demand Gen", "$12,500", "2h ago"],
-        ["MDF-4418", "Vertex Alliance", "ABM Webinar Series", "$8,900", "Today"],
-        ["MDF-4402", "BluePeak Tech", "Regional Event Sponsorship", "$15,000", "Yesterday"],
-      ]}
-    />
+    <div className="h-full flex flex-col overflow-hidden bg-white">
+      <header className="shrink-0 flex items-center justify-between px-6 py-3 border-b border-gray-200">
+        <div className="flex items-center gap-2 min-w-0">
+          <SalesforcePrmCloudIcon className="w-9 h-6 shrink-0 text-[#00A1E0]" />
+          <span className="text-[15px] font-semibold text-gray-900 truncate">Salesforce PRM</span>
+        </div>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 shrink-0 px-3 py-2 rounded-md text-[13px] font-semibold bg-[var(--shell-cta)] text-white border border-[var(--shell-cta)] hover:bg-[var(--shell-cta-hover)] hover:border-[var(--shell-cta-hover)] shadow-sm"
+        >
+          <Plus className="w-4 h-4" strokeWidth={2.5} />
+          New MDF Request
+        </button>
+      </header>
+
+      <div className="flex-1 min-h-0 overflow-auto">
+        <div className="px-6 pt-6 pb-4 border-b border-gray-200">
+          <h1 className="text-[26px] font-bold text-[#1f2937] leading-tight">
+            Your Marketing Development Funds (MDF)
+          </h1>
+        </div>
+
+        <div className="px-6 py-6 grid grid-cols-1 sm:grid-cols-2 gap-8 gap-y-6">
+          <div>
+            <h3 className="text-[18px] font-semibold text-gray-900 mb-2">MDF Summary for Apex Solutions</h3>
+            <p className="text-[14px] text-gray-700 leading-relaxed">
+              <span aria-hidden>✅ </span>
+              Total Available Funds to Claim: <strong className="font-bold text-gray-900">$14,500</strong>
+            </p>
+          </div>
+          <div>
+            <h3 className="text-[18px] font-semibold text-gray-900 mb-2">Overall Request Status</h3>
+            <p className="text-[14px] text-gray-700 leading-relaxed">
+              <span aria-hidden>📊 </span>
+              <strong className="font-bold text-gray-900">1</strong> Pending |{" "}
+              <strong className="font-bold text-gray-900">3</strong> Approved |{" "}
+              <strong className="font-bold text-gray-900">0</strong> Declined
+            </p>
+          </div>
+        </div>
+
+        <div className="px-6 pb-8 min-h-0">
+          <h3 className="text-[18px] font-semibold text-gray-900 mb-3">Your MDF Requests</h3>
+          <table className="w-full text-left">
+            <thead className="sticky top-0 z-[1] bg-[#fafafa] border-b border-gray-200">
+              <tr className="text-[12px] text-gray-500">
+                <th className="px-6 py-3 font-semibold">Type</th>
+                <th className="px-4 py-3 font-semibold">Campaign Name</th>
+                <th className="px-4 py-3 font-semibold">Requested</th>
+                <th className="px-4 py-3 font-semibold">Submitted</th>
+                <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="px-6 py-3 align-middle">
+                  <Megaphone className="w-5 h-5 text-gray-500" strokeWidth={2} aria-hidden />
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <div className="text-[14px] font-semibold text-[#1f4f75]">Q3 Cybersecurity Webinar</div>
+                  <div className="text-[14px] text-gray-700 mt-0.5">Apex Solutions</div>
+                </td>
+                <td className="px-4 py-3 text-[14px] font-medium text-gray-900">$5,000</td>
+                <td className="px-4 py-3 text-[14px] text-gray-700">Oct 1, 2025</td>
+                <td className="px-4 py-3 align-middle">
+                  <span
+                    className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${mdfRequestStatusPillClass("pending")}`}
+                  >
+                    Pending Approval
+                  </span>
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <MdfOutlineButton>View Details</MdfOutlineButton>
+                </td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="px-6 py-3 align-middle">
+                  <Megaphone className="w-5 h-5 text-gray-500" strokeWidth={2} aria-hidden />
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <div className="text-[14px] font-semibold text-[#1f4f75]">Partner Summit Sponsorship</div>
+                  <div className="text-[14px] text-gray-700 mt-0.5">Apex Solutions</div>
+                </td>
+                <td className="px-4 py-3 text-[14px] font-medium text-gray-900">$4,500</td>
+                <td className="px-4 py-3 text-[14px] text-gray-700">Sep 15, 2025</td>
+                <td className="px-4 py-3 align-middle">
+                  <span
+                    className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${mdfRequestStatusPillClass("approved")}`}
+                  >
+                    Approved
+                  </span>
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <MdfOutlineButton>View Details</MdfOutlineButton>
+                    <MdfOutlineButton>Submit POP</MdfOutlineButton>
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="px-6 py-3 align-middle">
+                  <Megaphone className="w-5 h-5 text-gray-500" strokeWidth={2} aria-hidden />
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <div className="text-[14px] font-semibold text-[#1f4f75]">Q4 Local Workshop Series</div>
+                  <div className="text-[14px] text-gray-700 mt-0.5">Apex Solutions</div>
+                </td>
+                <td className="px-4 py-3 text-[14px] font-medium text-gray-900">$4,000</td>
+                <td className="px-4 py-3 text-[14px] text-gray-700">Oct 10, 2025</td>
+                <td className="px-4 py-3 align-middle">
+                  <span
+                    className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${mdfRequestStatusPillClass("approved")}`}
+                  >
+                    Approved
+                  </span>
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <MdfOutlineButton>View Details</MdfOutlineButton>
+                    <MdfOutlineButton>View POP</MdfOutlineButton>
+                  </div>
+                </td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="px-6 py-3 align-middle">
+                  <Megaphone className="w-5 h-5 text-gray-500" strokeWidth={2} aria-hidden />
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <div className="text-[14px] font-semibold text-[#1f4f75]">Digital Ad Campaign</div>
+                  <div className="text-[14px] text-gray-700 mt-0.5">Apex Solutions</div>
+                </td>
+                <td className="px-4 py-3 text-[14px] font-medium text-gray-900">$5,500</td>
+                <td className="px-4 py-3 text-[14px] text-gray-700">Oct 5, 2025</td>
+                <td className="px-4 py-3 align-middle">
+                  <span
+                    className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${mdfRequestStatusPillClass("approved")}`}
+                  >
+                    Approved
+                  </span>
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <MdfOutlineButton>View Details</MdfOutlineButton>
+                    <MdfOutlineButton>Submit POP</MdfOutlineButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }
 

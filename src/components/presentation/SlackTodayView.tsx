@@ -40,6 +40,9 @@ const AVATAR_COLORS: Record<string, string> = {
   DT: "#FEF3C7",
   MT: "#FCE7F3",
   JH: "#EDE9FE",
+  AR: "#FEF3C7",
+  NK: "#DBEAFE",
+  PM: "#EDE9FE",
 };
 
 // ── Generates a deal-specific prep brief from RITA_DATA ───────────────────────
@@ -905,9 +908,15 @@ function AgendaItem({
 interface SlackTodayViewProps {
   onNavigateToActivity?: () => void;
   topViewMode?: "admin" | "channel-manager" | "seller";
+  /** Channel Manager only: partner portfolio vs company day-to-day (Partner View ignores this) */
+  channelManagerWorkspace?: "partner" | "company";
 }
 
-export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: SlackTodayViewProps = {}) {
+export function SlackTodayView({
+  onNavigateToActivity,
+  topViewMode = "admin",
+  channelManagerWorkspace = "company",
+}: SlackTodayViewProps = {}) {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const slackSidePanelRef = useRef<ImperativePanelHandle>(null);
   const [showTomorrow, setShowTomorrow] = useState(false);
@@ -989,10 +998,15 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
   const openQuotes = () => setActivePanel(p => p?.type === "quotes" ? null : { type: "quotes" });
   const openPrep = (dealId: string, meetingTime: string) =>
     setActivePanel(p => (p?.type === "prep" && (p as {type:"prep";dealId:string}).dealId === dealId) ? null : { type: "prep", dealId, meetingTime });
-  const { today } = RITA_DATA;
+  const { today, partnerToday } = RITA_DATA;
   const isAdminView = topViewMode === "admin";
   const isPartnerView = topViewMode === "seller";
   const isChannelManagerView = topViewMode === "channel-manager";
+  const usePartnerTodayContent =
+    isPartnerView ||
+    (isChannelManagerView && channelManagerWorkspace === "partner");
+  const repliesList = usePartnerTodayContent ? partnerToday.repliesNeeded : today.repliesNeeded;
+  const highlightsList = usePartnerTodayContent ? partnerToday.highlights : today.highlights;
 
   useLayoutEffect(() => {
     const panel = slackSidePanelRef.current;
@@ -1050,19 +1064,23 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                 {greeting.text}{" "}
                 <span className="inline-block hover:scale-110 transition-transform cursor-default">{greeting.emoji}</span>
               </h1>
-              <p className="text-[14px] text-gray-500">Slackbot found areas for you to focus on today:</p>
+              <p className="text-[14px] text-gray-500">
+                {usePartnerTodayContent
+                  ? "Here’s what Slackbot surfaced for your partner workspace:"
+                  : "Slackbot found areas for you to focus on today:"}
+              </p>
             </div>
 
             {/* Focus Prompts — spinning conic-gradient border on hover */}
             <div className="grid grid-cols-3 gap-4 mb-12 w-full" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
               <FocusPill
-                onClick={isAdminView ? openRisks : isPartnerView ? openRegisterDeals : openSetup}
+                onClick={isAdminView ? openRisks : usePartnerTodayContent ? openRegisterDeals : openSetup}
                 icon="🔍"
                 iconBg="bg-orange-50"
                 label={
                   isAdminView
                     ? "Review workspace risk flags"
-                    : isPartnerView
+                    : usePartnerTodayContent
                       ? "Register 4 deals from the meetings you were part of this week"
                       : "Complete the setup to start inviting Partners"
                 }
@@ -1079,9 +1097,15 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
               />
               <FocusPill
                 onClick={openQuotes}
-                icon={isAdminView ? "✅" : "✍️"}
-                iconBg="bg-blue-50"
-                label={isAdminView ? "Approve 4 pending access requests" : "Approve 2 pending quotes"}
+                icon={isAdminView ? "✅" : usePartnerTodayContent ? "🎓" : "✍️"}
+                iconBg={usePartnerTodayContent ? "bg-amber-50" : "bg-blue-50"}
+                label={
+                  isAdminView
+                    ? "Approve 4 pending access requests"
+                    : usePartnerTodayContent
+                      ? "Complete the recommended training to retain your Gold tier status"
+                      : "Approve 2 pending quotes"
+                }
                 restGradient="linear-gradient(135deg,#60a5fa,#818cf8,#a78bfa)"
                 colors="#60a5fa, #818cf8, #a78bfa, #c4b5fd, #60a5fa"
               />
@@ -1101,7 +1125,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                       <span className="text-[18px] flex-shrink-0">💬</span>
                       <h2 className="text-[15px] font-bold text-gray-900">Replies needed</h2>
                       {repliesStatus === "loaded" && (
-                        <span className="text-[13px] font-normal text-gray-400">· {today.repliesNeeded.length}</span>
+                        <span className="text-[13px] font-normal text-gray-400">· {repliesList.length}</span>
                       )}
                     </div>
                     <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -1168,7 +1192,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                   {/* Loaded state */}
                   {repliesStatus === "loaded" && (
                     <div className="space-y-3">
-                      {today.repliesNeeded.map((item) => (
+                      {repliesList.map((item) => (
                         <div
                           key={item.from}
                           className="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 cursor-pointer transition-colors"
@@ -1190,15 +1214,21 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                   {/* Empty / accomplished state */}
                   {repliesStatus === "empty" && (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
-                      <h3 className="text-[15px] font-bold text-gray-900 mb-1.5">No replies needed right now 🌱</h3>
-                      <p className="text-[13px] text-gray-500 mb-5">Slackbot might find a few other things for you to do:</p>
+                      <h3 className="text-[15px] font-bold text-gray-900 mb-1.5">
+                        {usePartnerTodayContent ? "No partner threads need a reply right now 🌱" : "No replies needed right now 🌱"}
+                      </h3>
+                      <p className="text-[13px] text-gray-500 mb-5">
+                        {usePartnerTodayContent
+                          ? "Slackbot can still point you to MDF, co-sell, and certification follow-ups:"
+                          : "Slackbot might find a few other things for you to do:"}
+                      </p>
                       <button
                         onClick={(e) => { e.stopPropagation(); setActivePanel({ type: "action-items" }); }}
                         className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-xl text-[13px] font-bold text-gray-800 hover:bg-gray-50 shadow-sm transition-all"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={assetPath("/slackbot-logo.svg")} alt="Slackbot" className="w-4 h-4" />
-                        Find action items for this week
+                        {usePartnerTodayContent ? "Find partner tasks for this week" : "Find action items for this week"}
                       </button>
                     </div>
                   )}
@@ -1212,7 +1242,9 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-[18px] flex-shrink-0">🔦</span>
                       <h2 className="text-[15px] font-bold text-gray-900 truncate">Top highlights</h2>
-                      <span className="text-[13px] text-gray-400 whitespace-nowrap hidden sm:block">Summaries of priority unreads</span>
+                      <span className="text-[13px] text-gray-400 whitespace-nowrap hidden sm:block">
+                        {usePartnerTodayContent ? "PRM, vendor, and co-sell updates" : "Summaries of priority unreads"}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                       <button className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-lg transition-colors" title="Refresh">
@@ -1270,7 +1302,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     )}
                   </div>
                   <div className="divide-y divide-gray-100">
-                    {today.highlights.map((h, i) => {
+                    {highlightsList.map((h, i) => {
                       const sentimentStyles = {
                         positive: { dot: "#22C55E", label: "" },
                         warning:  { dot: "#F97316", label: "⚠️ " },
@@ -1286,7 +1318,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                             />
                             <div className="flex-1 min-w-0">
                               <p className="text-[13px] text-gray-800 leading-snug">
-                                <span className="font-bold">Agentforce </span>
+                                <span className="font-bold">{usePartnerTodayContent ? "Partner digest " : "Agentforce "}</span>
                                 {s.label}{h.summary}
                               </p>
                               <div className="flex items-center gap-2 mt-1.5">
@@ -1359,14 +1391,17 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     )}
                   </div>
                   <div className="divide-y divide-gray-100">
-                    {today.highlights.slice(0, 2).map((h, i) => {
+                    {highlightsList.slice(0, 2).map((h, i) => {
                       const sentimentStyles = { positive: { dot: "#22C55E", label: "" }, warning: { dot: "#F97316", label: "⚠️ " }, critical: { dot: "#EF4444", label: "🚨 " } };
                       const s = sentimentStyles[h.sentiment];
                       return (
                         <div key={i} className="py-3 hover:bg-gray-50 -mx-1 px-1 rounded-lg cursor-pointer transition-colors">
                           <div className="flex items-start gap-2">
                             <span className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: s.dot }} />
-                            <p className="text-[13px] text-gray-800 leading-snug"><span className="font-bold">Agentforce </span>{s.label}{h.summary}</p>
+                            <p className="text-[13px] text-gray-800 leading-snug">
+                              <span className="font-bold">{usePartnerTodayContent ? "Partner digest " : "Agentforce "}</span>
+                              {s.label}{h.summary}
+                            </p>
                           </div>
                         </div>
                       );
@@ -1393,7 +1428,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-[18px] flex-shrink-0">💬</span>
                       <h2 className="text-[15px] font-bold text-gray-900">Replies needed</h2>
-                      <span className="text-[13px] font-normal text-gray-400">· {today.repliesNeeded.length}</span>
+                      <span className="text-[13px] font-normal text-gray-400">· {repliesList.length}</span>
                     </div>
                     <button onClick={(e) => { e.stopPropagation(); setIsRepliesMenuOpen(v => !v); }} className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-lg transition-colors flex-shrink-0">
                       <MoreHorizontal className="w-4 h-4" />
@@ -1412,7 +1447,7 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                     )}
                   </div>
                   <div className="space-y-2">
-                    {today.repliesNeeded.slice(0, 2).map((item) => (
+                    {repliesList.slice(0, 2).map((item) => (
                       <div key={item.from} className="border border-gray-200 rounded-xl p-3 hover:bg-gray-50 cursor-pointer transition-colors">
                         <p className="text-[12px] font-semibold text-gray-800 mb-1.5 leading-snug line-clamp-2">{item.preview}</p>
                         <div className="flex items-center gap-1.5">
@@ -1469,65 +1504,129 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                   )}
                 </div>
 
-                {/* Today's meetings */}
+                {/* Today's meetings — Partner View: PRM / co-sell / MDF; else AE + manager calendar */}
                 <div className="space-y-2">
-                  <AgendaItem
-                    title="Weekly Team Sync"
-                    subtitle="Q1 kickoff — your plan auto-shared"
-                    time="10:00am"
-                    badgeText="In 1h"
-                    badgeColor="bg-blue-50 text-blue-600"
-                    barColor="bg-blue-500"
-                    icon={MeetIcon}
-                    isMeeting
-                    onPrep={() => {}}
-                  />
-                  <AgendaItem
-                    title="Discovery Call — Acme Corp"
-                    subtitle="Champion: Priya Shah"
-                    dotColor="bg-orange-500"
-                    time="11:30am"
-                    barColor="bg-[var(--shell-agenda-bar)]"
-                    icon={MeetIcon}
-                    isMeeting
-                    onPrep={() => openPrep("deal-acme", "11:30am")}
-                  />
-                  <AgendaItem
-                    title="Lunch — Diane Park (CIO)"
-                    subtitle="Relationship meeting · $60K · Stage 3"
-                    dotColor="bg-emerald-500"
-                    time="1:00pm"
-                    barColor="bg-emerald-500"
-                    icon={CalIcon}
-                    onPrep={() => openPrep("deal-greentech", "1:00pm")}
-                  />
-                  <AgendaItem
-                    title="NovaCorp Legal Sync"
-                    subtitle="Clause 7.2 review · overdue 3 days"
-                    dotColor="bg-amber-500"
-                    time="2:30pm"
-                    barColor="bg-amber-500"
-                    icon={CalIcon}
-                    onPrep={() => openPrep("deal-novacorp", "2:30pm")}
-                  />
-                  <AgendaItem
-                    title="1:1 with Sarah Chen"
-                    subtitle="Agenda auto-generated: Q1 plan..."
-                    time="4:00pm"
-                    barColor="bg-indigo-500"
-                    icon={MeetIcon}
-                    isMeeting
-                    onPrep={() => {}}
-                  />
-                  <AgendaItem
-                    title="Sporty Nation Internal Review"
-                    subtitle="14 days silent · $270K at risk"
-                    dotColor="bg-red-500"
-                    time="5:00pm"
-                    barColor="bg-pink-500"
-                    icon={CalIcon}
-                    onPrep={() => openPrep("deal-sporty", "5:00pm")}
-                  />
+                  {usePartnerTodayContent ? (
+                    <>
+                      <AgendaItem
+                        title="Co-sell QBR — CloudWave × Apex"
+                        subtitle="Joint Q1 pipeline, attach targets, and MDF utilization"
+                        time="10:00am"
+                        badgeText="In 1h"
+                        badgeColor="bg-blue-50 text-blue-600"
+                        barColor="bg-blue-500"
+                        icon={MeetIcon}
+                        isMeeting
+                        onPrep={() => openPrep("deal-acme", "10:00am")}
+                      />
+                      <AgendaItem
+                        title="Greentech renewal — co-sell working session"
+                        subtitle="Vendor SE needs your attach worksheet before legal countersigns"
+                        dotColor="bg-emerald-500"
+                        time="11:30am"
+                        barColor="bg-emerald-500"
+                        icon={MeetIcon}
+                        isMeeting
+                        onPrep={() => openPrep("deal-greentech", "11:30am")}
+                      />
+                      <AgendaItem
+                        title="MDF office hours (POP & claims)"
+                        subtitle="Open drop-in with PRM ops — bring open requests"
+                        dotColor="bg-amber-500"
+                        time="1:00pm"
+                        barColor="bg-amber-500"
+                        icon={CalIcon}
+                        onPrep={() => {}}
+                      />
+                      <AgendaItem
+                        title="Partner certification office hours"
+                        subtitle="Renew before PRM locks deal registration access"
+                        dotColor="bg-orange-500"
+                        time="2:30pm"
+                        barColor="bg-[var(--shell-agenda-bar)]"
+                        icon={CalIcon}
+                        onPrep={() => {}}
+                      />
+                      <AgendaItem
+                        title="Pipeline alignment — Sarah Chen (vendor)"
+                        subtitle="Apex-sourced opps, co-sell coverage, and dispute queue"
+                        time="4:00pm"
+                        barColor="bg-indigo-500"
+                        icon={MeetIcon}
+                        isMeeting
+                        onPrep={() => {}}
+                      />
+                      <AgendaItem
+                        title="Apex Q1 partner scorecard review"
+                        subtitle="Tier, MDF burn, deal-reg SLA, and marketing commits"
+                        dotColor="bg-red-500"
+                        time="5:00pm"
+                        barColor="bg-pink-500"
+                        icon={CalIcon}
+                        onPrep={() => {}}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <AgendaItem
+                        title="Weekly Team Sync"
+                        subtitle="Q1 kickoff — your plan auto-shared"
+                        time="10:00am"
+                        badgeText="In 1h"
+                        badgeColor="bg-blue-50 text-blue-600"
+                        barColor="bg-blue-500"
+                        icon={MeetIcon}
+                        isMeeting
+                        onPrep={() => {}}
+                      />
+                      <AgendaItem
+                        title="Discovery Call — Acme Corp"
+                        subtitle="Champion: Priya Shah"
+                        dotColor="bg-orange-500"
+                        time="11:30am"
+                        barColor="bg-[var(--shell-agenda-bar)]"
+                        icon={MeetIcon}
+                        isMeeting
+                        onPrep={() => openPrep("deal-acme", "11:30am")}
+                      />
+                      <AgendaItem
+                        title="Lunch — Diane Park (CIO)"
+                        subtitle="Relationship meeting · $60K · Stage 3"
+                        dotColor="bg-emerald-500"
+                        time="1:00pm"
+                        barColor="bg-emerald-500"
+                        icon={CalIcon}
+                        onPrep={() => openPrep("deal-greentech", "1:00pm")}
+                      />
+                      <AgendaItem
+                        title="NovaCorp Legal Sync"
+                        subtitle="Clause 7.2 review · overdue 3 days"
+                        dotColor="bg-amber-500"
+                        time="2:30pm"
+                        barColor="bg-amber-500"
+                        icon={CalIcon}
+                        onPrep={() => openPrep("deal-novacorp", "2:30pm")}
+                      />
+                      <AgendaItem
+                        title="1:1 with Sarah Chen"
+                        subtitle="Agenda auto-generated: Q1 plan..."
+                        time="4:00pm"
+                        barColor="bg-indigo-500"
+                        icon={MeetIcon}
+                        isMeeting
+                        onPrep={() => {}}
+                      />
+                      <AgendaItem
+                        title="Sporty Nation Internal Review"
+                        subtitle="14 days silent · $270K at risk"
+                        dotColor="bg-red-500"
+                        time="5:00pm"
+                        barColor="bg-pink-500"
+                        icon={CalIcon}
+                        onPrep={() => openPrep("deal-sporty", "5:00pm")}
+                      />
+                    </>
+                  )}
                 </div>
 
                 {/* Tomorrow accordion */}
@@ -1540,13 +1639,25 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
                       className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${showTomorrow ? "rotate-90" : ""}`}
                     />
                     Tomorrow
-                    <span className="font-normal text-gray-400 ml-0.5">10 meetings</span>
+                    <span className="font-normal text-gray-400 ml-0.5">
+                      {usePartnerTodayContent ? "6 sessions" : "10 meetings"}
+                    </span>
                   </button>
                   {showTomorrow && (
                     <div className="mt-3 space-y-2 opacity-60 pointer-events-none">
-                      <AgendaItem title="Pipeline Review" subtitle="Q1 week 1 forecast" time="9:00am" barColor="bg-blue-500" icon={MeetIcon} isMeeting onPrep={() => {}} />
-                      <AgendaItem title="Greentech SOW Review" subtitle="SOW v2 with Diane" dotColor="bg-emerald-500" time="2:00pm" barColor="bg-emerald-500" icon={CalIcon} onPrep={() => {}} />
-                      <AgendaItem title="Acme Corp Follow-up" subtitle="Exec path with Priya" dotColor="bg-orange-500" time="4:30pm" barColor="bg-[var(--shell-agenda-bar)]" icon={MeetIcon} isMeeting onPrep={() => {}} />
+                      {usePartnerTodayContent ? (
+                        <>
+                          <AgendaItem title="Vertex Alliance partner QBR" subtitle="Territory overlap and MDF planning" time="9:00am" barColor="bg-blue-500" icon={MeetIcon} isMeeting onPrep={() => {}} />
+                          <AgendaItem title="PRM office hours — deal registration" subtitle="Submit evidence for pending regs" dotColor="bg-emerald-500" time="11:00am" barColor="bg-emerald-500" icon={CalIcon} onPrep={() => {}} />
+                          <AgendaItem title="Co-sell dry run — Acme expansion" subtitle="With CloudWave SE + Apex SE" dotColor="bg-orange-500" time="3:00pm" barColor="bg-[var(--shell-agenda-bar)]" icon={MeetIcon} isMeeting onPrep={() => {}} />
+                        </>
+                      ) : (
+                        <>
+                          <AgendaItem title="Pipeline Review" subtitle="Q1 week 1 forecast" time="9:00am" barColor="bg-blue-500" icon={MeetIcon} isMeeting onPrep={() => {}} />
+                          <AgendaItem title="Greentech SOW Review" subtitle="SOW v2 with Diane" dotColor="bg-emerald-500" time="2:00pm" barColor="bg-emerald-500" icon={CalIcon} onPrep={() => {}} />
+                          <AgendaItem title="Acme Corp Follow-up" subtitle="Exec path with Priya" dotColor="bg-orange-500" time="4:30pm" barColor="bg-[var(--shell-agenda-bar)]" icon={MeetIcon} isMeeting onPrep={() => {}} />
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

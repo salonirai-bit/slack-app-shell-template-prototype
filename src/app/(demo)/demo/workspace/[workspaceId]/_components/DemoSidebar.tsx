@@ -204,21 +204,95 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
   // Home view: Render Slack workspace sidebar
   if (activeNav === "home") {
     const activeDMId = activeChatId || effectiveChannelId;
-    
-    // Find DMs by name
-    const shwetaDM = dms.find(d => d.name.toLowerCase().includes("aisha")) || dms.find(d => d.name.toLowerCase().includes("raman")) || dms.find(d => d.name.toLowerCase().includes("shweta")) || dms[0];
-    const prantikDM = dms.find(d => d.name.toLowerCase().includes("prantik")) || dms.find(d => d.name.toLowerCase().includes("banerjee"));
-    
-    // Determine active states - Shweta is default active if nothing selected
-    const isShwetaActive = activeDMId === shwetaDM?.id || (!activeDMId && shwetaDM);
-    const isPrantikActive = activeDMId === prantikDM?.id;
+
     const isPartnerLeadsActive = activeChatId === "partner-leads";
     const isPartnerOpportunitiesActive = activeChatId === "partner-opportunities";
     const isPartnerMarketingActive = activeChatId === "partner-marketing";
     const isPartnerAccountsActive = activeChatId === "partner-accounts";
     const isPartnerContactsActive = activeChatId === "partner-contacts";
     const isPartnerMdfActive = activeChatId === "partner-mdf";
-    const isPartnerCampaignsActive = activeChatId === "partner-campaigns";
+
+    /** Partner View keeps the Slack-style DM shortcuts; Channel Manager tab omits them. */
+    const renderHomeDirectMessagesSection = () => {
+      const shwetaDM =
+        dms.find((d) => d.name.toLowerCase().includes("aisha")) ||
+        dms.find((d) => d.name.toLowerCase().includes("raman")) ||
+        dms.find((d) => d.name.toLowerCase().includes("shweta")) ||
+        dms[0];
+      const prantikDM =
+        dms.find((d) => d.name.toLowerCase().includes("prantik")) ||
+        dms.find((d) => d.name.toLowerCase().includes("banerjee"));
+      const isShwetaActive = activeDMId === shwetaDM?.id || (!activeDMId && shwetaDM);
+      const isPrantikActive = activeDMId === prantikDM?.id;
+
+      return (
+        <div className="mb-4">
+          <div className="px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group">
+            <span className="w-4 h-4 mr-1 flex items-center justify-center text-xs">⌄</span>
+            Direct messages
+          </div>
+          {shwetaDM && (
+            <button
+              onClick={() => {
+                if (setActiveChatId) {
+                  setActiveChatId(shwetaDM.id);
+                }
+              }}
+              className={cn(
+                "w-full flex items-center px-4 py-1 pl-8 text-[15px] font-medium rounded-r-full mr-4",
+                isShwetaActive ? "bg-white text-black" : "hover:bg-white/5 text-[#D1C2D0]"
+              )}
+            >
+              <div className="relative mr-2">
+                <img
+                  src={assetPath(shwetaDM.avatarUrl || getAvatarUrl("Aisha Raman", 20) || "/aisha-avatar.png")}
+                  className="w-5 h-5 rounded"
+                  alt="Aisha Raman"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = getAvatarUrl("Aisha Raman", 20);
+                  }}
+                />
+              </div>
+              Aisha Raman <span className="ml-2">🗓️</span>
+            </button>
+          )}
+          {prantikDM && (
+            <button
+              onClick={() => {
+                if (setActiveChatId) {
+                  setActiveChatId(prantikDM.id);
+                }
+              }}
+              className={cn(
+                "w-full flex items-center justify-between px-4 py-1 pl-8 text-[15px] group",
+                isPrantikActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
+              )}
+            >
+              <div className="flex items-center">
+                <div className="relative mr-2">
+                  <img
+                    src={assetPath(prantikDM.avatarUrl || getAvatarUrl("Prantik Banerjee", 20) || "/prantik-avatar.png")}
+                    className="w-5 h-5 rounded"
+                    alt="Prantik"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = getAvatarUrl("Prantik Banerjee", 20);
+                    }}
+                  />
+                  <div
+                    className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border"
+                    style={{ borderColor: isPartnerView ? "#1f1f23" : CM.sidebarScroll }}
+                  />
+                </div>
+                Prantik Banerjee <span className="ml-1 opacity-70 text-sm">you</span> <span className="ml-1">🤒</span>
+              </div>
+              <Edit2Icon className="w-3 h-3 opacity-0 group-hover:opacity-100" />
+            </button>
+          )}
+        </div>
+      );
+    };
 
     return (
       <aside
@@ -268,74 +342,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
             </button>
           </div>
 
-          {/* Section: Direct Messages */}
-          <div className="mb-4">
-            <div className="px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group">
-              <span className="w-4 h-4 mr-1 flex items-center justify-center text-xs">⌄</span>
-              Direct messages
-            </div>
-            {/* Active DM - Shweta */}
-            {shwetaDM && (
-              <button 
-                onClick={() => {
-                  if (setActiveChatId) {
-                    setActiveChatId(shwetaDM.id);
-                  }
-                }}
-                className={cn(
-                  "w-full flex items-center px-4 py-1 pl-8 text-[15px] font-medium rounded-r-full mr-4",
-                  isShwetaActive ? "bg-white text-black" : "hover:bg-white/5 text-[#D1C2D0]"
-                )}
-              >
-                <div className="relative mr-2">
-                  <img 
-                    src={assetPath(shwetaDM.avatarUrl || getAvatarUrl("Aisha Raman", 20) || "/aisha-avatar.png")} 
-                    className="w-5 h-5 rounded" 
-                    alt="Aisha Raman" 
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = getAvatarUrl("Aisha Raman", 20);
-                    }}
-                  />
-                </div>
-                Aisha Raman <span className="ml-2">🗓️</span>
-              </button>
-            )}
-            {/* Prantik */}
-            {prantikDM && (
-              <button 
-                onClick={() => {
-                  if (setActiveChatId) {
-                    setActiveChatId(prantikDM.id);
-                  }
-                }}
-                className={cn(
-                  "w-full flex items-center justify-between px-4 py-1 pl-8 text-[15px] group",
-                  isPrantikActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
-                )}
-              >
-                <div className="flex items-center">
-                  <div className="relative mr-2">
-                    <img 
-                      src={assetPath(prantikDM.avatarUrl || getAvatarUrl("Prantik Banerjee", 20) || "/prantik-avatar.png")} 
-                      className="w-5 h-5 rounded" 
-                      alt="Prantik"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = getAvatarUrl("Prantik Banerjee", 20);
-                      }}
-                    />
-                    <div
-                      className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border"
-                      style={{ borderColor: isPartnerView ? "#1f1f23" : CM.sidebarScroll }}
-                    />
-                  </div>
-                  Prantik Banerjee <span className="ml-1 opacity-70 text-sm">you</span> <span className="ml-1">🤒</span>
-                </div>
-                <Edit2Icon className="w-3 h-3 opacity-0 group-hover:opacity-100" />
-              </button>
-            )}
-          </div>
+          {!isChannelManager && renderHomeDirectMessagesSection()}
 
           {/* Section: Partners — Channel Manager tab only */}
           {isChannelManager && (
@@ -447,16 +454,6 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                       )}
                     >
                       MDF
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveChatId("partner-campaigns")}
-                      className={cn(
-                        "w-full flex items-center px-4 py-1 pl-9 text-[15px]",
-                        isPartnerCampaignsActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
-                      )}
-                    >
-                      Campaigns
                     </button>
                   </>
                 ) : (

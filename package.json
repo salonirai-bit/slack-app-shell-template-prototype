@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
+    "dev:clean": "rm -rf .next && NODE_OPTIONS='--max-old-space-size=4096' next dev",
     "build": "next build",
+    "build:local": "BASE_PATH= next build",
     "build:pages": "next build && rm -rf docs && cp -r out docs && touch docs/.nojekyll",
+    "preview:local": "npx --yes serve@14 out -l 3000",
     "start": "next start",
     "lint": "next lint",
     "heroku-postbuild": "echo \"Build: $(date -u +%Y%m%d%H%M%S)\" > public/build-id.txt && npm run build"

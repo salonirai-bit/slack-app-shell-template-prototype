@@ -15,6 +15,7 @@ import {
   DemoLayoutProviders,
   type NavView,
   type DemoContext,
+  type ChannelManagerWorkspaceId,
 } from "@/app/(demo)/demo/workspace/[workspaceId]/_context/demo-layout-context";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -80,6 +81,10 @@ export interface SlackAppShellProps {
   sidebarOverrideChannels?: import('@/context/DemoDataContext').DemoChannel[];
   sidebarApps?: Array<{ id: string; name: string; icon: string }>;
   topViewMode?: "admin" | "channel-manager" | "seller";
+
+  /** Channel Manager: Salesforce rail workspace switcher + Today content source */
+  channelManagerWorkspaceId?: ChannelManagerWorkspaceId;
+  onChannelManagerWorkspaceChange?: (id: ChannelManagerWorkspaceId) => void;
 }
 
 // -----------------------------------------------------------
@@ -104,6 +109,8 @@ export function SlackAppShell({
   sidebarOverrideChannels,
   sidebarApps,
   topViewMode = "channel-manager",
+  channelManagerWorkspaceId,
+  onChannelManagerWorkspaceChange,
 }: SlackAppShellProps) {
   const [isSlackbotOpen, setIsSlackbotOpen] = useState(forceSlackbotOpen);
   const [dealRegistrationPromptKey, setDealRegistrationPromptKey] = useState(0);
@@ -189,6 +196,8 @@ export function SlackAppShell({
               onNavChange={onNavChange}
               showDMBadge={showDMBadge}
               topViewMode={topViewMode}
+              channelManagerWorkspaceId={channelManagerWorkspaceId}
+              onChannelManagerWorkspaceChange={onChannelManagerWorkspaceChange}
             />
 
             {showSidebar ? (

@@ -389,6 +389,78 @@ export const RITA_DATA = {
       },
     ],
   },
+
+  /** Today tab when prototype is in Partner View (seller) — PRM, co-sell, MDF, not internal AE workflows */
+  partnerToday: {
+    repliesNeeded: [
+      {
+        from: "Aisha Raman",
+        channel: "PRM · MDF",
+        preview:
+          "Your Q3 Cybersecurity Webinar MDF is approved—upload POP by Jan 10 so finance can release the $5K tranche.",
+        time: "9:12 AM",
+        initials: "AR",
+      },
+      {
+        from: "Noah Kim",
+        channel: "#co-sell-greentech",
+        preview:
+          "We need Apex’s updated attach-rate worksheet for the Greentech renewal before legal countersigns. Can you upload v3 today?",
+        time: "Today",
+        initials: "NK",
+      },
+      {
+        from: "Partner Marketing",
+        channel: "DM",
+        preview:
+          "Partner Summit booth roster is due tomorrow—confirm who from Apex will staff the demo kiosk and badge pickup.",
+        time: "Today",
+        initials: "PM",
+      },
+    ],
+    highlights: [
+      {
+        channel: "PRM · Leads",
+        summary:
+          "14 partner-sourced leads were routed to Apex this week. Six sit in your territory—accept or decline in PRM by Friday to keep SLA green.",
+        mentions: [] as const,
+        time: "Today",
+        sentiment: "positive" as const,
+        reactions: [{ emoji: "✨", count: 4 }],
+        replies: 2,
+      },
+      {
+        channel: "#partner-cloudwave",
+        summary:
+          "CloudWave posted the co-sell battlecard for Acme’s Q3 expansion—review pricing guardrails before your Thursday customer call.",
+        mentions: [] as const,
+        time: "Today",
+        sentiment: "positive" as const,
+        reactions: [{ emoji: "🤝", count: 2 }],
+        replies: 1,
+      },
+      {
+        channel: "PRM · Compliance",
+        summary:
+          "Your salesperson certification expires in 14 days. Finish the renewal module to keep deal registration and MDF submission access.",
+        mentions: [] as const,
+        time: "Today",
+        sentiment: "warning" as const,
+        reactions: [{ emoji: "⏰", count: 1 }],
+        replies: 0,
+      },
+      {
+        channel: "PRM · Opportunities",
+        summary:
+          "Vertex Alliance reported a conflict on Sporty Nation—two partners logged the same opp. Review the dispute thread and confirm a primary partner.",
+        mentions: [] as const,
+        time: "10:42 AM",
+        sentiment: "critical" as const,
+        reactions: [],
+        replies: 3,
+      },
+    ],
+  },
 } as const;
 
 // Health dot colors — consistent across all views
