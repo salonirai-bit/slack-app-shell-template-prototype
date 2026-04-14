@@ -4,13 +4,21 @@ import React from "react";
 import { useSlackbot } from "../_context/demo-layout-context";
 import { IconSearch } from "@/components/icons";
 import { assetPath } from "@/lib/asset-path";
+import { cn } from "@/lib/utils";
 
-export function AppHeader() {
+export function AppHeader({
+  topViewMode = "channel-manager",
+}: {
+  topViewMode?: "admin" | "channel-manager" | "seller";
+} = {}) {
   const { isOpen, toggle } = useSlackbot();
   return (
     <header
-      className="h-12 shrink-0 flex items-center w-full relative bg-black"
-      style={{ zIndex: 100, marginTop: 0 }}
+      className={cn(
+        "h-12 shrink-0 flex items-center w-full relative z-[100] text-white",
+        topViewMode === "seller" ? "bg-[#0a0a0a]" : "bg-[#4A154B]"
+      )}
+      style={{ marginTop: 0 }}
     >
       {/* Spacer: align with list pillar (72px icon bar) - arrows start after */}
       <div className="w-[72px] shrink-0" aria-hidden />

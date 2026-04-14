@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+// GitHub Pages needs basePath; `output: 'export'` + basePath breaks `next dev` routing (404 on all pages).
+const publishBasePath = "/slack-app-shell-template-prototype";
+const isDev = process.env.NODE_ENV === "development";
+
 const nextConfig = {
     // Enable static export for GitHub Pages (GitSoma)
     // Comment out 'output: export' if deploying to Vercel/Netlify
@@ -10,7 +14,7 @@ const nextConfig = {
     // Demo mode: use placeholder when Convex not configured (Convex auth requires var to be set)
     env: {
         NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL || "https://demo-disabled.convex.cloud",
-        NEXT_PUBLIC_BASE_PATH: "/slack-app-shell-template-prototype",
+        NEXT_PUBLIC_BASE_PATH: isDev ? "" : publishBasePath,
     },
     images: {
         unoptimized: true, // Required for static export
@@ -19,9 +23,13 @@ const nextConfig = {
             { protocol: "https", hostname: "ui-avatars.com", pathname: "/**" },
         ],
     },
-    // Configure for GitSoma Pages deployment
-    basePath: '/slack-app-shell-template-prototype',
-    assetPrefix: '/slack-app-shell-template-prototype',
+    // Production / `next build`: GitSoma Pages. Local dev: serve at /
+    ...(isDev
+        ? {}
+        : {
+              basePath: publishBasePath,
+              assetPrefix: publishBasePath,
+          }),
 };
 
 export default nextConfig;

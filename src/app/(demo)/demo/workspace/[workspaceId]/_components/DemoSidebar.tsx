@@ -32,8 +32,6 @@ import {
   Send as SendIcon,
   Edit2 as Edit2Icon,
   Users as UsersIcon,
-  Star as StarIcon,
-  Lock as LockIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -53,6 +51,7 @@ import { useActiveChat } from "@/components/presentation/SlackAppShell";
 import { cn } from "@/lib/utils";
 import { SLACK_TOKENS } from "@/design/slack-tokens";
 import { assetPath } from "@/lib/asset-path";
+import { CHANNEL_MANAGER_PARTNERS } from "@/data/channel-manager-partners";
 
 const T = SLACK_TOKENS;
 
@@ -133,11 +132,36 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "compact">("list");
   const [isPartnerCloudOpen, setIsPartnerCloudOpen] = useState(true);
+  const [isPartnersSectionOpen, setIsPartnersSectionOpen] = useState(true);
 
   const showAllDmsTabs = activeNav === "home" || activeNav === "activity" || activeNav === "more";
   const showSearchAndFilters = activeNav !== "later";
   const isDmView = activeNav === "dms" || activeNav === "agentforce";
   const useDarkTheme = isDmView;
+  const isChannelManager = topViewMode === "channel-manager";
+  const isPartnerView = topViewMode === "seller";
+  /** Partner tab only: DM / Agentforce sidebar uses gray chrome instead of purple */
+  const isPartnerDmSidebar = isPartnerView && useDarkTheme;
+  const usePurpleLightSidebar = isChannelManager && !useDarkTheme;
+  const CM = T.channelManager;
+
+  const dmSkin = {
+    sidebarBg: isPartnerDmSidebar ? T.partnerDmChrome.sidebarBg : T.colors.dmSidebarBg,
+    sidebarSelect: isPartnerDmSidebar ? T.partnerDmChrome.sidebarSelect : T.colors.dmSidebarSelect,
+    rowHover: isPartnerDmSidebar ? T.partnerDmChrome.rowHover : "#52215A",
+    rowOpen: isPartnerDmSidebar ? T.partnerDmChrome.rowOpen : "#52215A",
+    searchBg: isPartnerDmSidebar ? T.partnerDmChrome.searchBg : T.colors.dmSearchBg,
+    searchBorder: isPartnerDmSidebar ? T.partnerDmChrome.searchBorder : T.colors.dmSearchGlow,
+    searchPlaceholder: isPartnerDmSidebar ? T.partnerDmChrome.searchPlaceholder : T.colors.dmSearchPlaceholder,
+    toggleTrack: isPartnerDmSidebar ? T.partnerDmChrome.toggleTrack : T.colors.dmToggleTrack,
+    toggleThumbOff: isPartnerDmSidebar
+      ? T.partnerDmChrome.toggleThumbOff
+      : isChannelManager
+        ? CM.toggleThumbOff
+        : T.colors.dmToggleThumb,
+    toggleThumbOn: isPartnerDmSidebar ? T.partnerDmChrome.toggleThumbOn : T.colors.dmToggleThumbOn,
+    mutedText: isPartnerDmSidebar ? T.partnerDmChrome.mutedText : T.colors.dmMutedText,
+  };
 
   const channelAndDmItems = (
     filter === "dms"
@@ -183,14 +207,10 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
     
     // Find DMs by name
     const shwetaDM = dms.find(d => d.name.toLowerCase().includes("aisha")) || dms.find(d => d.name.toLowerCase().includes("raman")) || dms.find(d => d.name.toLowerCase().includes("shweta")) || dms[0];
-    const jonnieDM = dms.find(d => d.name.toLowerCase().includes("noah")) || dms.find(d => d.name.toLowerCase().includes("kim")) || dms.find(d => d.name.toLowerCase().includes("jonnie")) || dms.find(d => d.name.toLowerCase().includes("lee"));
-    const miekDM = dms.find(d => d.name.toLowerCase().includes("caleb")) || dms.find(d => d.name.toLowerCase().includes("stone")) || dms.find(d => d.name.toLowerCase().includes("miek")) || dms.find(d => d.name.toLowerCase().includes("lenz"));
     const prantikDM = dms.find(d => d.name.toLowerCase().includes("prantik")) || dms.find(d => d.name.toLowerCase().includes("banerjee"));
     
     // Determine active states - Shweta is default active if nothing selected
     const isShwetaActive = activeDMId === shwetaDM?.id || (!activeDMId && shwetaDM);
-    const isJonnieActive = activeDMId === jonnieDM?.id;
-    const isMiekActive = activeDMId === miekDM?.id;
     const isPrantikActive = activeDMId === prantikDM?.id;
     const isPartnerLeadsActive = activeChatId === "partner-leads";
     const isPartnerOpportunitiesActive = activeChatId === "partner-opportunities";
@@ -199,10 +219,14 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
     const isPartnerContactsActive = activeChatId === "partner-contacts";
     const isPartnerMdfActive = activeChatId === "partner-mdf";
     const isPartnerCampaignsActive = activeChatId === "partner-campaigns";
-    const isPartnerView = topViewMode === "seller";
-    
+
     return (
-      <aside className="w-[340px] h-full bg-black text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans">
+      <aside
+        className={cn(
+          "w-[340px] h-full text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans",
+          isPartnerView ? "bg-black" : "bg-[#4A154B]"
+        )}
+      >
         {/* Workspace Header */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-white/10 hover:bg-white/5 cursor-pointer transition-colors flex-shrink-0">
           <div className="font-bold text-white text-[15px] flex items-center gap-1">
@@ -219,7 +243,12 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
         </div>
 
         {/* Scrollable Channel Tree */}
-        <div className="flex-1 overflow-y-auto py-3 custom-scrollbar bg-[#1f1f23]">
+        <div
+          className={cn(
+            "flex-1 overflow-y-auto py-3 custom-scrollbar",
+            isPartnerView ? "bg-[#1f1f23]" : "bg-[#350D35]"
+          )}
+        >
           {/* Top Links */}
           <div className="space-y-0.5 mb-5">
             <button className="w-full flex items-center px-4 py-1 hover:bg-white/5 text-[15px]">
@@ -231,23 +260,11 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
             <button className="w-full flex items-center px-4 py-1 hover:bg-white/5 text-[15px]">
               <SparklesIcon className="w-4 h-4 mr-3 opacity-70" /> Recap
             </button>
-            <button className="w-full flex items-center justify-between px-4 py-1 hover:bg-white/5 text-[15px]">
-              <div className="flex items-center"><SendIcon className="w-4 h-4 mr-3 opacity-70" /> Drafts & sent</div>
-              <span className="text-xs flex items-center gap-1"><Edit2Icon className="w-3 h-3"/> 12</span>
+            <button className="w-full flex items-center px-4 py-1 hover:bg-white/5 text-[15px]">
+              <SendIcon className="w-4 h-4 mr-3 opacity-70" /> Drafts & sent
             </button>
             <button className="w-full flex items-center px-4 py-1 hover:bg-white/5 text-[15px]">
               <UsersIcon className="w-4 h-4 mr-3 opacity-70" /> Directories
-            </button>
-          </div>
-
-          {/* Section: Starred */}
-          <div className="mb-4">
-            <div className="px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group">
-              <span className="w-4 h-4 mr-1 opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs">⌄</span>
-              <StarIcon className="w-3.5 h-3.5 mr-2" /> Starred
-            </div>
-            <button className="w-full flex items-center px-4 py-1 pl-9 hover:bg-white/5 text-[15px] text-[#D1C2D0]">
-              <img src={assetPath("/Salesforce.png")} alt="channel" className="w-3.5 h-3.5 mr-2 object-contain opacity-70 grayscale" /> proj-ai-council
             </button>
           </div>
 
@@ -284,62 +301,6 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                 Aisha Raman <span className="ml-2">🗓️</span>
               </button>
             )}
-            {/* Jonnie */}
-            {jonnieDM && (
-              <button 
-                onClick={() => {
-                  if (setActiveChatId) {
-                    setActiveChatId(jonnieDM.id);
-                  }
-                }}
-                className={cn(
-                  "w-full flex items-center justify-between px-4 py-1 pl-8 text-[15px] group",
-                  isJonnieActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
-                )}
-              >
-                <div className="flex items-center">
-                  <img 
-                    src={assetPath(jonnieDM.avatarUrl || getAvatarUrl("Noah Kim", 20) || "/noah-avatar.png")} 
-                    className="w-5 h-5 rounded mr-2" 
-                    alt="Noah Kim"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = getAvatarUrl("Noah Kim", 20);
-                    }}
-                  /> 
-                  Noah Kim
-                </div>
-                <Edit2Icon className="w-3 h-3 opacity-0 group-hover:opacity-100" />
-              </button>
-            )}
-            {/* Miek */}
-            {miekDM && (
-              <button 
-                onClick={() => {
-                  if (setActiveChatId) {
-                    setActiveChatId(miekDM.id);
-                  }
-                }}
-                className={cn(
-                  "w-full flex items-center justify-between px-4 py-1 pl-8 text-[15px] group",
-                  isMiekActive ? "bg-white text-black font-medium rounded-r-full mr-4" : "hover:bg-white/5 text-[#D1C2D0]"
-                )}
-              >
-                <div className="flex items-center">
-                  <img 
-                    src={assetPath(miekDM.avatarUrl || getAvatarUrl("Caleb Stone", 20) || "/caleb-avatar.png")} 
-                    className="w-5 h-5 rounded mr-2" 
-                    alt="Caleb Stone"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = getAvatarUrl("Caleb Stone", 20);
-                    }}
-                  /> 
-                  Caleb Stone <span className="ml-2">🗓️</span>
-                </div>
-                <Edit2Icon className="w-3 h-3 opacity-0 group-hover:opacity-100" />
-              </button>
-            )}
             {/* Prantik */}
             {prantikDM && (
               <button 
@@ -364,7 +325,10 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                         target.src = getAvatarUrl("Prantik Banerjee", 20);
                       }}
                     />
-                    <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border border-[#1f1f23]"></div>
+                    <div
+                      className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border"
+                      style={{ borderColor: isPartnerView ? "#1f1f23" : CM.sidebarScroll }}
+                    />
                   </div>
                   Prantik Banerjee <span className="ml-1 opacity-70 text-sm">you</span> <span className="ml-1">🤒</span>
                 </div>
@@ -372,6 +336,51 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
               </button>
             )}
           </div>
+
+          {/* Section: Partners — Channel Manager tab only */}
+          {isChannelManager && (
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() => setIsPartnersSectionOpen((open) => !open)}
+                className="w-full px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group"
+              >
+                <span className="w-4 h-4 mr-1 flex items-center justify-center text-xs">
+                  {isPartnersSectionOpen ? "⌄" : "›"}
+                </span>
+                Partners
+              </button>
+              {isPartnersSectionOpen &&
+                CHANNEL_MANAGER_PARTNERS.map((partner) => {
+                  const isPartnerRowActive = activeChatId === partner.id;
+                  return (
+                    <button
+                      key={partner.id}
+                      type="button"
+                      onClick={() => setActiveChatId(partner.id)}
+                      className={cn(
+                        "w-full flex items-center px-4 py-1 pl-8 text-left text-[15px] transition-colors",
+                        isPartnerRowActive
+                          ? "bg-white text-black font-medium rounded-r-full mr-4"
+                          : "hover:bg-white/5 text-[#D1C2D0]"
+                      )}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={assetPath(partner.avatarUrl)}
+                        alt={partner.name}
+                        className="w-5 h-5 rounded object-cover shrink-0 mr-2"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = getAvatarUrl(partner.name, 20);
+                        }}
+                      />
+                      <span className="truncate min-w-0">{partner.name}</span>
+                    </button>
+                  );
+                })}
+            </div>
+          )}
 
           {/* Section: Partner Cloud */}
           <div className="mb-4">
@@ -487,37 +496,6 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
               </>
             )}
           </div>
-
-          {/* Section: S-M-S */}
-          <div className="mb-4">
-            <div className="px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group">
-              <span className="w-4 h-4 mr-1 flex items-center justify-center text-xs">⌄</span>
-              <span className="w-3.5 h-3.5 mr-2 rounded-full border-2 border-dashed border-[var(--shell-sidebar-accent-blue)]"></span> S-M-S
-            </div>
-            <button className="w-full flex items-center px-4 py-1 pl-9 hover:bg-white/5 text-[15px] text-white font-bold">
-              <LockIcon className="w-3 h-3 mr-2 opacity-70" /> proj-hush-contact-insights-ai-...
-            </button>
-            <button className="w-full flex items-center px-4 py-1 pl-9 hover:bg-white/5 text-[15px] text-[#D1C2D0]">
-              <LockIcon className="w-3 h-3 mr-2 opacity-70" /> proj-marketing-sales-all
-            </button>
-            <button className="w-full flex items-center px-4 py-1 pl-9 hover:bg-white/5 text-[15px] text-[#D1C2D0]">
-              <LockIcon className="w-3 h-3 mr-2 opacity-70" /> proj-salescloud-all-agents-wor...
-            </button>
-          </div>
-
-          {/* Section: Agentforce */}
-          <div className="mb-4">
-            <div className="px-4 py-1 flex items-center text-[13px] font-medium hover:text-white cursor-pointer group">
-              <span className="w-4 h-4 mr-1 flex items-center justify-center text-xs">⌄</span>
-              <span className="w-3 h-3 mr-2 rounded bg-[var(--shell-sidebar-accent-blue)]"></span> Agentforce
-            </div>
-            <button className="w-full flex items-center px-4 py-1 pl-9 hover:bg-white/5 text-[15px] text-[#D1C2D0]">
-              <img src={assetPath("/Salesforce.png")} alt="channel" className="w-3.5 h-3.5 mr-2 object-contain opacity-70 grayscale" /> ai-club
-            </button>
-            <button className="w-full flex items-center px-4 py-1 pl-9 hover:bg-white/5 text-[15px] text-[#D1C2D0]">
-              <img src={assetPath("/Salesforce.png")} alt="channel" className="w-3.5 h-3.5 mr-2 object-contain opacity-70 grayscale" /> ux-agentic-experiences
-            </button>
-          </div>
         </div>
       </aside>
     );
@@ -558,7 +536,12 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
     ];
 
     return (
-      <aside className="w-[340px] h-full bg-black text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans">
+      <aside
+        className={cn(
+          "w-[340px] h-full text-[#D1C2D0] flex flex-col flex-shrink-0 border-r border-white/10 font-sans",
+          topViewMode === "seller" ? "bg-black" : "bg-[#4A154B]"
+        )}
+      >
         {/* Header */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-white/10 flex-shrink-0">
           <span className="font-bold text-white text-[15px]">Files</span>
@@ -568,7 +551,12 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
         </div>
 
         {/* Scrollable nav + file lists */}
-        <div className="flex-1 overflow-y-auto py-3 custom-scrollbar bg-[#1f1f23]">
+        <div
+          className={cn(
+            "flex-1 overflow-y-auto py-3 custom-scrollbar",
+            topViewMode === "seller" ? "bg-[#1f1f23]" : "bg-[#350D35]"
+          )}
+        >
           {/* Nav items */}
           <div className="space-y-0.5 mb-5 px-2">
             <button className="w-full flex items-center px-3 py-1.5 rounded-md bg-[var(--shell-files-nav-active)] text-white text-[14px] font-bold">
@@ -633,8 +621,18 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
     <aside
       className="w-[340px] flex-shrink-0 flex flex-col h-full border-r"
       style={{
-        background: useDarkTheme ? T.colors.dmSidebarBg : "#ffffff",
-        borderColor: useDarkTheme ? "transparent" : T.colors.border,
+        background: useDarkTheme
+          ? dmSkin.sidebarBg
+          : usePurpleLightSidebar
+            ? CM.lightSurface
+            : "#ffffff",
+        borderColor: useDarkTheme
+          ? isPartnerDmSidebar
+            ? "rgba(255,255,255,0.08)"
+            : "transparent"
+          : usePurpleLightSidebar
+            ? CM.lightBorder
+            : T.colors.border,
         ...(useDarkTheme && {
           boxShadow: "inset 1px 0 0 rgba(255,255,255,0.06)",
         }),
@@ -659,13 +657,13 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                 aria-checked={unreadsOnly}
                 onClick={() => setUnreadsOnly((v) => !v)}
                 className="w-9 h-5 rounded-full transition-colors relative"
-                style={{ backgroundColor: T.colors.dmToggleTrack }}
+                style={{ backgroundColor: dmSkin.toggleTrack }}
               >
                 <span
                   className="absolute top-0.5 w-4 h-4 rounded-full transition-all"
                   style={{
                     left: unreadsOnly ? "18px" : "4px",
-                    backgroundColor: unreadsOnly ? T.colors.dmToggleThumbOn : T.colors.dmToggleThumb,
+                    backgroundColor: unreadsOnly ? dmSkin.toggleThumbOn : dmSkin.toggleThumbOff,
                   }}
                 />
               </button>
@@ -677,19 +675,27 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
           {/* DM Search Bar */}
           <div className="px-4 pb-4 shrink-0">
             <div
-              className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-150 focus-within:border-white focus-within:shadow-[0_0_0_1px_#fff,0_0_0_2px_#a189b2,0_0_12px_rgba(161,137,178,0.35)]"
+              className={cn(
+                "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-150 focus-within:border-white",
+                isPartnerDmSidebar
+                  ? "focus-within:shadow-[0_0_0_1px_#fff,0_0_0_3px_rgba(255,255,255,0.12)]"
+                  : "focus-within:shadow-[0_0_0_1px_#fff,0_0_0_2px_#a189b2,0_0_12px_rgba(161,137,178,0.35)]"
+              )}
               style={{
-                backgroundColor: T.colors.dmSearchBg,
-                border: `1px solid ${T.colors.dmSearchGlow}`,
+                backgroundColor: dmSkin.searchBg,
+                border: `1px solid ${dmSkin.searchBorder}`,
               }}
             >
-              <IconSearch width={14} height={14} style={{ color: T.colors.dmSearchPlaceholder }} stroke="currentColor" />
+              <IconSearch width={14} height={14} style={{ color: dmSkin.searchPlaceholder }} stroke="currentColor" />
               <input
                 type="text"
                 placeholder={activeNav === "agentforce" ? "Find an agent" : "Find a DM"}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="flex-1 min-w-0 bg-transparent focus:outline-none placeholder:text-[#c1acD1]"
+                className={cn(
+                  "flex-1 min-w-0 bg-transparent focus:outline-none",
+                  isPartnerDmSidebar ? "placeholder:text-[#9da3ad]" : "placeholder:text-[#c1acD1]"
+                )}
                 style={{ color: "#fff", fontSize: T.typography.small }}
               />
             </div>
@@ -698,26 +704,40 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
       ) : (
         <>
           {/* Non-DM Header - Title row (Home, Activity, etc.) */}
-          <div className="px-3 py-3 border-b flex items-center justify-between gap-2 shrink-0" style={{ borderColor: T.colors.border }}>
+          <div
+            className="px-3 py-3 border-b flex items-center justify-between gap-2 shrink-0"
+            style={{ borderColor: usePurpleLightSidebar ? CM.lightBorder : T.colors.border }}
+          >
             <div className="flex items-center gap-2">
               <span className="font-bold" style={{ fontSize: T.typography.header, color: T.colors.text }}>{title}</span>
               {showBetaBadge && (
                 <span className="px-1.5 py-0.5 text-[10px] font-medium rounded" style={{ backgroundColor: T.colors.betaBadgeBg, color: T.colors.betaBadgeText }}>Beta</span>
               )}
             </div>
-            <button type="button" className="p-2 rounded-md hover:bg-[#e8e8e8] ml-auto flex items-center justify-center" style={{ color: "#555" }} title="Settings">
+            <button
+              type="button"
+              className={cn(
+                "p-2 rounded-md ml-auto flex items-center justify-center",
+                usePurpleLightSidebar ? "hover:bg-[#EDD8F0]" : "hover:bg-[#e8e8e8]"
+              )}
+              style={{ color: usePurpleLightSidebar ? CM.textMutedOnLight : "#555" }}
+              title="Settings"
+            >
               <IconSettings width={18} height={18} stroke="currentColor" />
             </button>
           </div>
 
           {/* All/DMs Tabs - Only for Home, Activity, More views */}
           {showAllDmsTabs && (
-            <div className="flex items-center gap-1 px-2 py-2 border-b shrink-0" style={{ borderColor: T.colors.border }}>
+            <div
+              className="flex items-center gap-1 px-2 py-2 border-b shrink-0"
+              style={{ borderColor: usePurpleLightSidebar ? CM.lightBorder : T.colors.border }}
+            >
               <button
                 type="button"
                 className={cn(
                   "relative px-3 py-1.5 font-medium rounded flex items-center gap-1.5",
-                  filter === "all" ? "" : "hover:bg-[#f8f8f8]"
+                  filter === "all" ? "" : usePurpleLightSidebar ? "hover:bg-[#EDD8F0]" : "hover:bg-[#f8f8f8]"
                 )}
                 style={filter === "all" ? { color: T.colors.text, fontSize: T.typography.small } : { color: T.colors.textSecondary, fontSize: T.typography.small }}
                 onClick={() => setFilter("all")}
@@ -730,7 +750,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                 type="button"
                 className={cn(
                   "relative px-3 py-1.5 font-medium rounded",
-                  filter === "dms" ? "" : "hover:bg-[#f8f8f8]"
+                  filter === "dms" ? "" : usePurpleLightSidebar ? "hover:bg-[#EDD8F0]" : "hover:bg-[#f8f8f8]"
                 )}
                 style={filter === "dms" ? { color: T.colors.text, fontSize: T.typography.small } : { color: T.colors.textSecondary, fontSize: T.typography.small }}
                 onClick={() => setFilter("dms")}
@@ -740,7 +760,10 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
               </button>
               <button
                 type="button"
-                className="p-1.5 rounded hover:bg-[#f8f8f8]"
+                className={cn(
+                  "p-1.5 rounded",
+                  usePurpleLightSidebar ? "hover:bg-[#EDD8F0]" : "hover:bg-[#f8f8f8]"
+                )}
                 style={{ color: T.colors.textSecondary }}
                 title="Add"
               >
@@ -751,26 +774,72 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
 
           {/* Search and Filters Bar - Only for non-Files/Later views */}
           {showSearchAndFilters && (
-            <div className="flex items-center gap-1 px-2 py-1.5 border-b shrink-0" style={{ borderColor: T.colors.border }}>
-              <button type="button" className="flex items-center gap-1 px-2 py-1.5 rounded hover:bg-[#f8f8f8]" style={{ color: T.colors.textSecondary }} title="Select">
+            <div
+              className="flex items-center gap-1 px-2 py-1.5 border-b shrink-0"
+              style={{ borderColor: usePurpleLightSidebar ? CM.lightBorder : T.colors.border }}
+            >
+              <button
+                type="button"
+                className={cn(
+                  "flex items-center gap-1 px-2 py-1.5 rounded",
+                  usePurpleLightSidebar ? "hover:bg-[#EDD8F0]" : "hover:bg-[#f8f8f8]"
+                )}
+                style={{ color: T.colors.textSecondary }}
+                title="Select"
+              >
                 <IconSquare width={14} height={14} stroke="currentColor" strokeWidth={2} />
-                <span className="w-px h-4" style={{ backgroundColor: T.colors.border }} />
+                <span
+                  className="w-px h-4"
+                  style={{
+                    backgroundColor: usePurpleLightSidebar ? CM.lightBorder : T.colors.border,
+                  }}
+                />
                 <IconChevronDown width={12} height={12} stroke="currentColor" />
               </button>
-              <button type="button" className="p-1.5 rounded hover:bg-[#f8f8f8]" style={{ color: T.colors.textSecondary }} title="Capture">
+              <button
+                type="button"
+                className={cn("p-1.5 rounded", usePurpleLightSidebar ? "hover:bg-[#EDD8F0]" : "hover:bg-[#f8f8f8]")}
+                style={{ color: T.colors.textSecondary }}
+                title="Capture"
+              >
                 <IconLayoutGrid width={14} height={14} stroke="currentColor" />
               </button>
-              <button type="button" className="flex items-center gap-1 px-2 py-1.5 rounded hover:bg-[#f8f8f8]" style={{ color: T.colors.textSecondary }} title="Filter">
+              <button
+                type="button"
+                className={cn(
+                  "flex items-center gap-1 px-2 py-1.5 rounded",
+                  usePurpleLightSidebar ? "hover:bg-[#EDD8F0]" : "hover:bg-[#f8f8f8]"
+                )}
+                style={{ color: T.colors.textSecondary }}
+                title="Filter"
+              >
                 <IconFilter width={14} height={14} stroke="currentColor" />
-                <span className="w-px h-4" style={{ backgroundColor: T.colors.border }} />
+                <span
+                  className="w-px h-4"
+                  style={{
+                    backgroundColor: usePurpleLightSidebar ? CM.lightBorder : T.colors.border,
+                  }}
+                />
                 <IconChevronDown width={12} height={12} stroke="currentColor" />
               </button>
               <div className="flex-1" />
-              <div className="flex rounded overflow-hidden border" style={{ borderColor: T.colors.border }}>
+              <div
+                className="flex rounded overflow-hidden border"
+                style={{ borderColor: usePurpleLightSidebar ? CM.lightBorder : T.colors.border }}
+              >
                 <button
                   type="button"
                   onClick={() => setViewMode("list")}
-                  className={cn("p-1.5", viewMode === "list" ? "bg-[#f0f0f0]" : "hover:bg-[#f8f8f8]")}
+                  className={cn(
+                    "p-1.5",
+                    viewMode === "list"
+                      ? usePurpleLightSidebar
+                        ? "bg-[#E5D0EB]"
+                        : "bg-[#f0f0f0]"
+                      : usePurpleLightSidebar
+                        ? "hover:bg-[#EDD8F0]"
+                        : "hover:bg-[#f8f8f8]"
+                  )}
                   style={{ color: T.colors.textSecondary }}
                   title="List view"
                 >
@@ -779,8 +848,20 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                 <button
                   type="button"
                   onClick={() => setViewMode("compact")}
-                  className={cn("p-1.5 border-l", viewMode === "compact" ? "bg-[#f0f0f0]" : "hover:bg-[#f8f8f8]")}
-                  style={{ borderColor: T.colors.border, color: T.colors.textSecondary }}
+                  className={cn(
+                    "p-1.5 border-l",
+                    viewMode === "compact"
+                      ? usePurpleLightSidebar
+                        ? "bg-[#E5D0EB]"
+                        : "bg-[#f0f0f0]"
+                      : usePurpleLightSidebar
+                        ? "hover:bg-[#EDD8F0]"
+                        : "hover:bg-[#f8f8f8]"
+                  )}
+                  style={{
+                    borderColor: usePurpleLightSidebar ? CM.lightBorder : T.colors.border,
+                    color: T.colors.textSecondary,
+                  }}
                   title="Compact view"
                 >
                   <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -795,8 +876,16 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
 
           {/* Later Search Bar */}
           {activeNav === "later" && (
-            <div className="px-2 py-1.5 border-b shrink-0" style={{ borderColor: T.colors.border }}>
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded" style={{ backgroundColor: T.colors.backgroundAlt }}>
+            <div
+              className="px-2 py-1.5 border-b shrink-0"
+              style={{ borderColor: usePurpleLightSidebar ? CM.lightBorder : T.colors.border }}
+            >
+              <div
+                className="flex items-center gap-1.5 px-2 py-1 rounded"
+                style={{
+                  backgroundColor: usePurpleLightSidebar ? CM.lightPressed : T.colors.backgroundAlt,
+                }}
+              >
                 <IconSearch width={14} height={14} className="shrink-0" style={{ color: T.colors.textSecondary }} stroke="currentColor" />
                 <input
                   type="text"
@@ -896,10 +985,18 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
           );
           const buttonStyle = showDivider ? { borderBottom: "1px solid rgba(255,255,255,0.06)" } : {};
           
-          // Text colors: white for selected, light gray for unselected
-          const nameColor = isActive ? "#FFFFFF" : "#D1C2D0";
-          const previewColor = isActive ? "rgba(255,255,255,0.8)" : "rgba(209,194,208,0.7)";
-          const timestampColor = isActive ? "rgba(255,255,255,0.6)" : "rgba(209,194,208,0.6)";
+          // Text colors: white for selected; unselected — warm lavender (CM) vs neutral gray (Partner)
+          const nameColor = isActive ? "#FFFFFF" : isPartnerDmSidebar ? "#e8e9eb" : "#D1C2D0";
+          const previewColor = isActive
+            ? "rgba(255,255,255,0.88)"
+            : isPartnerDmSidebar
+              ? "rgba(163,168,176,0.95)"
+              : "rgba(209,194,208,0.7)";
+          const timestampColor = isActive
+            ? "rgba(255,255,255,0.65)"
+            : isPartnerDmSidebar
+              ? dmSkin.mutedText
+              : "rgba(209,194,208,0.6)";
           
           if (isPresentationMode && (!!setActiveChatId || !!onDmSelect)) {
             // In presentation mode, use button element (no URL navigation)
@@ -1009,10 +1106,14 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
           const avatarSrc = assetPath(item.isSlackbot ? "/slackbot-logo.svg" : (item.avatarUrl || getAvatarUrl(item.name, 64)));
           const className = cn(
             "flex items-start gap-3 px-3 py-2.5 rounded-lg group w-full transition-colors cursor-pointer",
-            isActive ? "" : "hover:bg-[#52215A]"
+            isActive ? "" : isPartnerDmSidebar ? "hover:bg-[#32353b]" : "hover:bg-[#52215A]"
           );
           const style = {
-            ...(isActive ? { backgroundColor: T.colors.dmSidebarSelect } : openDropdownId === item.id ? { backgroundColor: "#52215A" } : {}),
+            ...(isActive
+              ? { backgroundColor: dmSkin.sidebarSelect }
+              : openDropdownId === item.id
+                ? { backgroundColor: dmSkin.rowOpen }
+                : {}),
             borderBottom: "1px solid rgba(255,255,255,0.06)",
           };
           
@@ -1044,7 +1145,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                   <span className="truncate font-medium text-white" style={{ fontSize: T.typography.body }}>{item.name}</span>
                 </div>
                   {preview && (
-                    <p className="mt-0.5 min-w-0 line-clamp-2 break-words" style={{ color: T.colors.dmMutedText }}>{preview}</p>
+                    <p className="mt-0.5 min-w-0 line-clamp-2 break-words" style={{ color: dmSkin.mutedText }}>{preview}</p>
                   )}
                 </div>
                 <div className="shrink-0 mt-0.5 w-[72px] flex justify-end items-center" onClick={(e) => e.stopPropagation()}>
@@ -1112,7 +1213,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                     </DropdownMenu>
                   </div>
                   {timestamp && (
-                    <span className={cn("text-right", openDropdownId === item.id ? "hidden" : "group-hover:hidden")} style={{ fontSize: T.typography.smaller, color: T.colors.dmMutedText }}>{timestamp}</span>
+                    <span className={cn("text-right", openDropdownId === item.id ? "hidden" : "group-hover:hidden")} style={{ fontSize: T.typography.smaller, color: dmSkin.mutedText }}>{timestamp}</span>
                   )}
                 </div>
               </div>
@@ -1147,7 +1248,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                   <span className="truncate font-medium text-white" style={{ fontSize: T.typography.body }}>{item.name}</span>
                 </div>
                 {preview && (
-                  <p className="mt-0.5 min-w-0 line-clamp-2 break-words" style={{ color: T.colors.dmMutedText }}>{preview}</p>
+                  <p className="mt-0.5 min-w-0 line-clamp-2 break-words" style={{ color: dmSkin.mutedText }}>{preview}</p>
                 )}
               </div>
               <div className="shrink-0 mt-0.5 w-[72px] flex justify-end items-center" onClick={(e) => e.stopPropagation()}>
@@ -1215,7 +1316,7 @@ export function DemoSidebar({ activeDmId: propActiveDmId, onDmSelect, overrideDm
                   </DropdownMenu>
                 </div>
                 {timestamp && (
-                  <span className={cn("text-right", openDropdownId === item.id ? "hidden" : "group-hover:hidden")} style={{ fontSize: T.typography.smaller, color: T.colors.dmMutedText }}>{timestamp}</span>
+                  <span className={cn("text-right", openDropdownId === item.id ? "hidden" : "group-hover:hidden")} style={{ fontSize: T.typography.smaller, color: dmSkin.mutedText }}>{timestamp}</span>
                 )}
               </div>
             </Link>

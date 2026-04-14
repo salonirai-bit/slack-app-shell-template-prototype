@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import type { ImperativePanelHandle } from "react-resizable-panels";
 import { MoreHorizontal, ChevronRight, CheckCircle2, RefreshCw } from "lucide-react";
 import { RITA_DATA, HEALTH_COLORS } from "@/lib/ritaData";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/resizable";
 import { motion, AnimatePresence } from "framer-motion";
 import { assetPath } from "@/lib/asset-path";
+import { cn } from "@/lib/utils";
 
 // ── Panel state — tracks both the panel type and the specific deal it was triggered from ──
 type ActivePanel =
@@ -907,6 +909,7 @@ interface SlackTodayViewProps {
 
 export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: SlackTodayViewProps = {}) {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+  const slackSidePanelRef = useRef<ImperativePanelHandle>(null);
   const [showTomorrow, setShowTomorrow] = useState(false);
 
   // Agenda menu
@@ -989,6 +992,14 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
   const { today } = RITA_DATA;
   const isAdminView = topViewMode === "admin";
   const isPartnerView = topViewMode === "seller";
+  const isChannelManagerView = topViewMode === "channel-manager";
+
+  useLayoutEffect(() => {
+    const panel = slackSidePanelRef.current;
+    if (!panel) return;
+    if (activePanel) panel.expand(22);
+    else panel.collapse();
+  }, [activePanel]);
 
   return (
     <ResizablePanelGroup
@@ -997,15 +1008,23 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Lato, sans-serif' }}
     >
       {/* ── Main left area ── */}
-      <ResizablePanel id="today-main" order={1} minSize={30} className="overflow-hidden">
+      <ResizablePanel id="today-main" order={1} minSize={30} defaultSize={100} className="overflow-hidden">
       <div
         className="h-full flex flex-col overflow-hidden"
-        style={{ background: "linear-gradient(to bottom, #ffffff 0%, #f4e8f1 100%)" }}
+        style={{
+          background: isChannelManagerView
+            ? "linear-gradient(to bottom, #faf5ff 0%, #f4e8f1 50%, #edd8f0 100%)"
+            : "linear-gradient(to bottom, #ffffff 0%, #f4e8f1 100%)",
+        }}
       >
         {/* Top bar */}
         <div
           className="flex items-center justify-between px-8 py-3 shrink-0"
-          style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}
+          style={{
+            borderBottom: isChannelManagerView
+              ? "1px solid rgba(74, 21, 75, 0.12)"
+              : "1px solid rgba(0,0,0,0.06)",
+          }}
         >
           <div className="flex items-center gap-2">
             <span className="text-[17px] font-bold text-gray-900">Today</span>
@@ -1564,32 +1583,44 @@ export function SlackTodayView({ onNavigateToActivity, topViewMode = "admin" }: 
       </div>
       </ResizablePanel>
 
-      {/* ── Slackbot side panel ── */}
-      <AnimatePresence>
-        {activePanel && (
-          <>
-            <ResizableHandle
-              withHandle={false}
-              className="!w-[6px] shrink-0 !bg-transparent border-0 cursor-col-resize focus-visible:ring-0 data-[resize-handle-active]:bg-gray-200/60"
-            />
-            <ResizablePanel id="today-slackbot" order={2} minSize={22} defaultSize={35} className="overflow-visible">
-              <motion.div
-                key="slackbot-panel"
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 30 }}
-                transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                className="h-full overflow-hidden"
-              >
-                <SlackbotPanel
-                  panelData={buildScript(activePanel)}
-                  onClose={() => setActivePanel(null)}
-                />
-              </motion.div>
-            </ResizablePanel>
-          </>
+      {/* ── Slackbot side panel (always mounted so PanelGroup layout stays valid) ── */}
+      <ResizableHandle
+        withHandle={false}
+        className={cn(
+          "!w-[6px] shrink-0 !bg-transparent border-0 cursor-col-resize focus-visible:ring-0 data-[resize-handle-active]:bg-gray-200/60",
+          !activePanel &&
+            "!w-0 min-w-0 max-w-0 shrink border-0 p-0 opacity-0 pointer-events-none"
         )}
-      </AnimatePresence>
+      />
+      <ResizablePanel
+        ref={slackSidePanelRef}
+        id="today-slackbot"
+        order={2}
+        minSize={22}
+        defaultSize={0}
+        maxSize={50}
+        collapsible
+        collapsedSize={0}
+        className="min-w-0 overflow-hidden"
+      >
+        <AnimatePresence mode="wait">
+          {activePanel ? (
+            <motion.div
+              key="slackbot-panel"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 30 }}
+              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+              className="h-full overflow-hidden"
+            >
+              <SlackbotPanel
+                panelData={buildScript(activePanel)}
+                onClose={() => setActivePanel(null)}
+              />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </ResizablePanel>
     </ResizablePanelGroup>
   );
 }

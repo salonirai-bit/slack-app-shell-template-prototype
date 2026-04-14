@@ -61,6 +61,38 @@ export const SLACK_TOKENS = {
     avatarBgVariants: ["#611f69", "#e01e5a", "#36c5f0", "#2eb886", "#ecb22e"],
   },
 
+  /**
+   * Partner View — DM / Agentforce left list (dark gray, replaces purple dmSidebar* in that tab only).
+   */
+  partnerDmChrome: {
+    sidebarBg: "#252628",
+    sidebarSelect: "#3d4046",
+    rowHover: "#32353b",
+    rowOpen: "#35383e",
+    searchBg: "#2f3136",
+    searchBorder: "#4b4e55",
+    searchPlaceholder: "#9da3ad",
+    toggleTrack: "#1a1b1e",
+    toggleThumbOff: "#8b909a",
+    toggleThumbOn: "#ffffff",
+    mutedText: "#a3a8b0",
+  },
+
+  /** Channel Manager tab — aubergine chrome (#4A154B); light surfaces stay lavender, not gray/black */
+  channelManager: {
+    shell: "#4A154B",
+    rail: "#4A154B",
+    sidebarScroll: "#350D35",
+    lightSurface: "#F9EDFF",
+    lightHover: "#EDD8F0",
+    lightPressed: "#E5D0EB",
+    lightBorder: "#DCC9E4",
+    textMutedOnLight: "#5c4866",
+    toggleThumbOff: "#EDE4F5",
+    overlayScrim: "rgba(74, 21, 75, 0.42)",
+    partnerRail: "#0a0a0a",
+  },
+
   typography: {
     fontFamily: '"Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 

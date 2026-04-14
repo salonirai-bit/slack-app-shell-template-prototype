@@ -6,6 +6,12 @@ import { ChatMessage } from "@/components/shared/ChatMessage";
 import { ChevronRight, Search, Star, MoreVertical, ChevronDown } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { useDealRegistrationPrompt } from "@/context/DealRegistrationPromptContext";
+import { getAvatarUrl } from "@/context/DemoDataContext";
+import {
+  CHANNEL_MANAGER_PARTNERS,
+  CHANNEL_MANAGER_PARTNER_MESSAGES,
+  isChannelManagerPartnerChatId,
+} from "@/data/channel-manager-partners";
 
 // ─── Shared Chat Messages ────────────────────────────────────────────────────
 
@@ -21,6 +27,9 @@ const AVATARS = {
   marcus: "https://randomuser.me/api/portraits/med/men/8.jpg",
   lisa: "https://randomuser.me/api/portraits/med/women/65.jpg",
   mike: "https://randomuser.me/api/portraits/med/men/45.jpg",
+  aisha: "https://randomuser.me/api/portraits/med/women/21.jpg",
+  /** Current user (“You”) in DM threads — replace public/persona-you.png to update */
+  you: assetPath("/persona-you.png"),
   bot: assetPath("/slackbot-logo.svg"),
 };
 
@@ -81,43 +90,63 @@ const CHANNEL_MESSAGES: Record<string, Msg[]> = {
 const DM_MESSAGES: Record<string, Msg[]> = {
   "sarah-chen": [
     { name: "Sarah Chen", avatar: AVATARS.sarah, time: "9:00 AM", text: "Hey — can we sync on the Acme timeline? I want to make sure we're aligned before the board meeting." },
-    { name: "You", avatar: AVATARS.rita, time: "9:05 AM", text: "Sure! I just spoke with Daniel. Procurement is the last step. Should have an answer by EOD." },
+    { name: "You", avatar: AVATARS.you, time: "9:05 AM", text: "Sure! I just spoke with Daniel. Procurement is the last step. Should have an answer by EOD." },
     { name: "Sarah Chen", avatar: AVATARS.sarah, time: "9:10 AM", text: "Perfect. Also — keep me posted on Sporty Nation. I want to discuss it in our 1:1." },
   ],
   "priya-shah": [
     { name: "Priya Shah", avatar: AVATARS.priya, time: "Yesterday", text: "MSA redlines are done. Sent final version to Daniel's team. Should hear back tomorrow." },
-    { name: "You", avatar: AVATARS.rita, time: "Yesterday", text: "Great work! I'll follow up with procurement on our end." },
+    { name: "You", avatar: AVATARS.you, time: "Yesterday", text: "Great work! I'll follow up with procurement on our end." },
     { name: "Priya Shah", avatar: AVATARS.priya, time: "10:00 AM", text: "Daniel's EA confirmed the exec intro for next week. Things are moving!" },
   ],
   "jordan-hayes": [
     { name: "Jordan Hayes", avatar: AVATARS.jordan, time: "10:30 AM", text: "Tech architecture doc for Acme is ready. Want to review before I share in the channel?" },
-    { name: "You", avatar: AVATARS.rita, time: "10:35 AM", text: "Yes please, send it over. I'll review in the next hour." },
+    { name: "You", avatar: AVATARS.you, time: "10:35 AM", text: "Yes please, send it over. I'll review in the next hour." },
     { name: "Jordan Hayes", avatar: AVATARS.jordan, time: "10:40 AM", text: "Sent! Also, I have POC slots open this week if any deals need hands-on support." },
   ],
   "dana-torres": [
     { name: "Dana Torres", avatar: AVATARS.dana, time: "Yesterday", text: "Runners Club implementation team is ready. Can we schedule the kickoff for Monday?" },
-    { name: "You", avatar: AVATARS.rita, time: "Yesterday", text: "Monday works! I'll set up the calendar invite. Great job closing this one." },
+    { name: "You", avatar: AVATARS.you, time: "Yesterday", text: "Monday works! I'll set up the calendar invite. Great job closing this one." },
     { name: "Dana Torres", avatar: AVATARS.dana, time: "Today", text: "Thanks! Also sending over the onboarding checklist for your review." },
   ],
   "marcus-lee": [
     { name: "Marcus Lee", avatar: AVATARS.marcus, time: "11:00 AM", text: "Still no response from Chris Park at Sporty Nation. Should I try the breakup email approach?" },
-    { name: "You", avatar: AVATARS.rita, time: "11:05 AM", text: "Let's try multi-threading first. Mike found a LinkedIn connection to their VP Digital." },
+    { name: "You", avatar: AVATARS.you, time: "11:05 AM", text: "Let's try multi-threading first. Mike found a LinkedIn connection to their VP Digital." },
     { name: "Marcus Lee", avatar: AVATARS.marcus, time: "11:10 AM", text: "Good idea. I'll coordinate with Mike and draft the outreach today." },
   ],
   "lisa-park": [
     { name: "Lisa Park", avatar: AVATARS.lisa, time: "Yesterday", text: "TechStart QBR slides are uploaded. Can you check the executive summary section?" },
-    { name: "You", avatar: AVATARS.rita, time: "Yesterday", text: "Looks good! Added a few notes on the competitive landscape slide." },
+    { name: "You", avatar: AVATARS.you, time: "Yesterday", text: "Looks good! Added a few notes on the competitive landscape slide." },
     { name: "Lisa Park", avatar: AVATARS.lisa, time: "Today", text: "Perfect. Dry run is Thursday 10am — I'll send the invite." },
   ],
   "daniel-kim": [
     { name: "Daniel Kim", avatar: AVATARS.daniel, time: "10:00 AM", text: "Procurement is reviewing the Acme contract. Should have final sign-off by end of week." },
-    { name: "You", avatar: AVATARS.rita, time: "10:05 AM", text: "Thanks Daniel. Is there anything they need from our side to speed this up?" },
+    { name: "You", avatar: AVATARS.you, time: "10:05 AM", text: "Thanks Daniel. Is there anything they need from our side to speed this up?" },
     { name: "Daniel Kim", avatar: AVATARS.daniel, time: "10:15 AM", text: "Just the volume discount terms in writing. I'll send the template." },
   ],
   "mike-torres": [
     { name: "Mike Torres", avatar: AVATARS.mike, time: "Today", text: "Found a warm intro to Sporty Nation's VP Digital through a mutual connection." },
-    { name: "You", avatar: AVATARS.rita, time: "Today", text: "That's huge! Can you set up a casual intro call this week?" },
+    { name: "You", avatar: AVATARS.you, time: "Today", text: "That's huge! Can you set up a casual intro call this week?" },
     { name: "Mike Torres", avatar: AVATARS.mike, time: "Today", text: "On it. I'll reach out today and loop you in once it's confirmed." },
+  ],
+  "aisha-raman": [
+    {
+      name: "Aisha Raman",
+      avatar: AVATARS.aisha,
+      time: "9:12 AM",
+      text: "Hey — welcome to PRM on Slack! I'm Aisha, your channel manager. Glad to have you in the workspace. How's it going so far?",
+    },
+    {
+      name: "You",
+      avatar: AVATARS.you,
+      time: "9:18 AM",
+      text: "Hi Aisha — thanks for the welcome. Still finding my way around PRM in Slack but it's coming together. Appreciate you reaching out.",
+    },
+    {
+      name: "Aisha Raman",
+      avatar: AVATARS.aisha,
+      time: "9:20 AM",
+      text: "Anytime. If anything feels unclear or you want a quick tour of leads, MDF, or campaigns, just ping me here.",
+    },
   ],
 };
 
@@ -133,16 +162,50 @@ const AGENT_MESSAGES: Record<string, Msg[]> = {
   ],
 };
 
-export function resolveChat(itemId: string): { title: string; messages: Msg[] } {
+export function resolveChat(itemId: string): {
+  title: string;
+  messages: Msg[];
+  headerAvatarUrl?: string;
+  headerAvatarAlt?: string;
+} {
   if (CHANNEL_MESSAGES[`#${itemId}`]) {
     return { title: `#${itemId}`, messages: CHANNEL_MESSAGES[`#${itemId}`] };
   }
   if (DM_MESSAGES[itemId]) {
     const name = itemId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-    return { title: name, messages: DM_MESSAGES[itemId] };
+    const messages = DM_MESSAGES[itemId];
+    const headerAvatarUrl = messages[0]?.avatar;
+    return { title: name, messages, headerAvatarUrl, headerAvatarAlt: name };
   }
   if (AGENT_MESSAGES[itemId]) {
-    return { title: itemId.replace("af-", "").split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") + " Agent", messages: AGENT_MESSAGES[itemId] };
+    const title =
+      itemId.replace("af-", "").split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ") +
+      " Agent";
+    const messages = AGENT_MESSAGES[itemId];
+    return {
+      title,
+      messages,
+      headerAvatarUrl: messages[0]?.avatar,
+      headerAvatarAlt: title,
+    };
+  }
+  if (isChannelManagerPartnerChatId(itemId)) {
+    const partner = CHANNEL_MANAGER_PARTNERS.find((x) => x.id === itemId);
+    const turns = CHANNEL_MANAGER_PARTNER_MESSAGES[itemId];
+    if (partner && turns?.length) {
+      const messages: Msg[] = turns.map((t) => ({
+        name: t.role === "you" ? "You" : partner.name,
+        avatar: t.role === "you" ? AVATARS.you : partner.avatarUrl,
+        time: t.time,
+        text: t.text,
+      }));
+      return {
+        title: partner.name,
+        messages,
+        headerAvatarUrl: partner.avatarUrl,
+        headerAvatarAlt: partner.name,
+      };
+    }
   }
   return { title: `#${itemId}`, messages: CHANNEL_MESSAGES["#general"]! };
 }
@@ -158,11 +221,28 @@ export function TemplateChatContent({ channelName, activeChatId }: TemplateChatC
   const resolved = activeChatId ? resolveChat(activeChatId) : null;
   const title = resolved?.title ?? channelName ?? "#general";
   const messages = resolved?.messages ?? CHANNEL_MESSAGES[channelName ?? "#general"] ?? CHANNEL_MESSAGES["#general"]!;
+  const headerAvatarUrl = resolved?.headerAvatarUrl;
+  const headerAvatarAlt = resolved?.headerAvatarAlt ?? (typeof title === "string" ? title : "");
+  const isCmPartnerThread =
+    !!activeChatId && isChannelManagerPartnerChatId(activeChatId);
 
   return (
     <UniversalChatSurface
       title={title}
-      memberCount={12}
+      icon={
+        headerAvatarUrl ? (
+          <img
+            src={headerAvatarUrl}
+            className="w-5 h-5 rounded"
+            alt={headerAvatarAlt}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = getAvatarUrl(headerAvatarAlt, 40);
+            }}
+          />
+        ) : undefined
+      }
+      memberCount={isCmPartnerThread ? undefined : 12}
       placeholder={`Message ${title}`}
       onSendMessage={(text) => console.log("Send:", text)}
     >

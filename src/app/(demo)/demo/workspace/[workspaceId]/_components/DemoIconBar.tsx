@@ -14,7 +14,14 @@ import {
   IconPlus,
 } from "@/components/icons";
 import { Sun, BarChart3 } from "lucide-react";
-import { useDemoData, getAvatarUrl, type DemoDM, type DemoFile, type DemoSavedItem } from "@/context/DemoDataContext";
+import {
+  useDemoData,
+  getAvatarUrl,
+  getMessageAvatarUrl,
+  type DemoDM,
+  type DemoFile,
+  type DemoSavedItem,
+} from "@/context/DemoDataContext";
 import { useNav, usePresentationMode, useDemoContext, type NavView } from "../_context/demo-layout-context";
 import { cn } from "@/lib/utils";
 import { SLACK_TOKENS } from "@/design/slack-tokens";
@@ -25,8 +32,8 @@ const T = SLACK_TOKENS;
 const navItems = [
   { icon: Sun,         label: "Today",      id: "today"      as const, href: "/today" },
   { icon: IconHome,    label: "Home",       id: "home"       as const, href: "/activity" },
-  { icon: IconMessage, label: "DMs",        id: "dms"        as const, href: "/dms" },
-  { icon: IconBell,    label: "Activity",   id: "activity"   as const, badge: 18, href: "/activity" },
+  { icon: IconMessage, label: "DMs",        id: "dms"        as const, href: "/dms", badge: 18 },
+  { icon: IconBell,    label: "Activity",   id: "activity"   as const, href: "/activity" },
   { icon: IconFolder,  label: "Files",      id: "files"      as const, href: "/files" },
   { icon: IconBookmark,label: "Later",      id: "later"      as const, href: "/later" },
   { icon: IconBot,     label: "Agentforce", id: "agentforce" as const, href: "/agentforce" },
@@ -377,9 +384,15 @@ interface DemoIconBarProps {
   /** Fires for every nav item click — the Shell uses this to update its internal nav state. */
   onNavChange?: (nav: NavView) => void;
   showDMBadge?: boolean;
+  topViewMode?: "admin" | "channel-manager" | "seller";
 }
 
-export function DemoIconBar({ onPrimaryNavChange, onNavChange, showDMBadge = false }: DemoIconBarProps = {}) {
+export function DemoIconBar({
+  onPrimaryNavChange,
+  onNavChange,
+  showDMBadge = false,
+  topViewMode = "channel-manager",
+}: DemoIconBarProps = {}) {
   const params = useParams();
   const workspaceId = (params.workspaceId as string) || "demo-1";
   const base = `/demo/workspace/${workspaceId}`;
@@ -391,6 +404,15 @@ export function DemoIconBar({ onPrimaryNavChange, onNavChange, showDMBadge = fal
 
   // Global icon bar: Always filter out Slackbot DM (Seller Edge is Arc 1 specific)
   const filteredDms = dms.filter((dm) => !dm.isSlackbot);
+
+  const profileImgSrc =
+    topViewMode === "channel-manager"
+      ? assetPath(
+          dms.find((d) => d.id === "aisha-raman")?.avatarUrl ||
+            getMessageAvatarUrl("Aisha Raman") ||
+            "https://randomuser.me/api/portraits/med/women/21.jpg"
+        )
+      : assetPath("/profile-persona.png");
 
   // Flyout overlay state
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -420,7 +442,10 @@ export function DemoIconBar({ onPrimaryNavChange, onNavChange, showDMBadge = fal
   return (
     <>
       <aside
-        className="w-[72px] flex-shrink-0 flex flex-col items-center py-4 gap-0 bg-black"
+        className={cn(
+          "w-[72px] flex-shrink-0 flex flex-col items-center py-4 gap-0 text-white",
+          topViewMode === "seller" ? "bg-[#0a0a0a]" : "bg-[#4A154B]"
+        )}
       >
         {/* Logo */}
         <div className="mb-4 flex items-center justify-center">
@@ -437,8 +462,14 @@ export function DemoIconBar({ onPrimaryNavChange, onNavChange, showDMBadge = fal
           const href = base + item.href;
           const isActive = activeNav === item.id;
           const isHovered = hoveredId === item.id;
-          const showBadge = item.id === "dms" ? showDMBadge : item.badge !== undefined;
-          const badgeVal  = item.id === "dms" && showDMBadge ? 1 : item.badge;
+          const showBadge =
+            item.id === "dms"
+              ? showDMBadge || item.badge !== undefined
+              : item.badge !== undefined;
+          const badgeVal =
+            item.id === "dms" && showDMBadge
+              ? 1
+              : item.badge;
 
           return (
             <div
@@ -524,14 +555,18 @@ export function DemoIconBar({ onPrimaryNavChange, onNavChange, showDMBadge = fal
           <IconPlus width={T.iconSizes.navIconPlus} height={T.iconSizes.navIconPlus} stroke="currentColor" />
         </button>
 
-        {/* Profile avatar */}
+        {/* Profile avatar — Aisha (channel manager) in Channel Manager tab only; default asset elsewhere */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={assetPath("/profile-persona.png")}
+          src={profileImgSrc}
           alt="Profile"
           className="w-8 h-8 mt-2 object-cover border border-white/20 shrink-0"
           style={{ borderRadius: `${T.radius.avatar}px` }}
           title="Profile"
+          onError={(e) => {
+            const el = e.target as HTMLImageElement;
+            el.src = assetPath("/profile-persona.png");
+          }}
         />
       </aside>
 

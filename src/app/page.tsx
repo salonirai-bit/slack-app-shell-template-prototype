@@ -114,44 +114,59 @@ export default function Home() {
   return (
     <div
       className={cn(
-        "flex flex-col w-screen h-screen overflow-hidden",
+        "flex min-h-0 w-full max-w-full flex-col overflow-hidden",
+        /* dvh keeps the shell within the visible viewport (mobile toolbars, embedded previews) */
+        "h-dvh max-h-dvh",
         activeTopView === "seller" && "partner-chrome"
       )}
     >
-      <div className="h-12 shrink-0 bg-[#1f1f23] border-b border-white/10 px-4 flex items-center">
-        <div className="inline-flex items-center rounded-md bg-white/10 p-1">
+      <div
+        className={cn(
+          "flex h-12 shrink-0 items-center border-b border-white/10 px-4",
+          activeTopView === "channel-manager" ? "bg-[#4A154B]" : "bg-[#1f1f23]"
+        )}
+        role="tablist"
+        aria-label="Prototype view"
+      >
+        <div className="inline-flex items-center gap-1 rounded-md bg-white/10 p-1">
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTopView === "admin"}
             onClick={() => setActiveTopView("admin")}
             className={cn(
-              "px-3 py-1.5 text-[13px] rounded-md transition-colors",
+              "shrink-0 rounded-md px-3 py-1.5 text-[13px] transition-colors",
               activeTopView === "admin"
-                ? "bg-[var(--shell-cta)] text-white font-semibold"
-                : "text-white/80 hover:text-white hover:bg-white/10"
+                ? "bg-[var(--shell-cta)] font-semibold text-white"
+                : "text-white/80 hover:bg-white/10 hover:text-white"
             )}
           >
             Admin
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTopView === "channel-manager"}
             onClick={() => setActiveTopView("channel-manager")}
             className={cn(
-              "px-3 py-1.5 text-[13px] rounded-md transition-colors",
+              "shrink-0 rounded-md px-3 py-1.5 text-[13px] transition-colors",
               activeTopView === "channel-manager"
-                ? "bg-[var(--shell-cta)] text-white font-semibold"
-                : "text-white/80 hover:text-white hover:bg-white/10"
+                ? "bg-[var(--shell-cta)] font-semibold text-white"
+                : "text-white/80 hover:bg-white/10 hover:text-white"
             )}
           >
             Channel Manager
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTopView === "seller"}
             onClick={() => setActiveTopView("seller")}
             className={cn(
-              "px-3 py-1.5 text-[13px] rounded-md transition-colors",
+              "shrink-0 rounded-md px-3 py-1.5 text-[13px] transition-colors",
               activeTopView === "seller"
-                ? "bg-[var(--shell-cta)] text-white font-semibold"
-                : "text-white/80 hover:text-white hover:bg-white/10"
+                ? "bg-[var(--shell-cta)] font-semibold text-white"
+                : "text-white/80 hover:bg-white/10 hover:text-white"
             )}
           >
             Partner View
@@ -160,27 +175,29 @@ export default function Home() {
       </div>
 
       {activeTopView === "admin" ? (
-        <div className="flex-1 min-h-0 bg-[#0f1115] p-3">
+        <div className="flex min-h-0 flex-1 flex-col bg-[#0f1115] p-3">
           <iframe
             title="Salesforce Go Admin View"
             src={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/salesforce-go/admin-clean.html`}
-            className="w-full h-full rounded-xl border border-white/10 bg-white"
+            className="min-h-0 w-full flex-1 rounded-xl border border-white/10 bg-white"
           />
         </div>
       ) : (
-        <SlackAppShell
-          activeNavId={activeNavId}
-          onNavChange={handleNavChange}
-          showSidebar={showSidebar}
-        topViewMode={activeTopView}
-          activeChatId={activeChatId}
-          onChatChange={handleChatChange}
-          sidebarActiveDmId={activeNavId === "dms" ? activeDmId : undefined}
-          sidebarOnDmSelect={activeNavId === "dms" ? setActiveDmId : undefined}
-          sidebarOverrideDms={activeNavId === "dms" ? GENERIC_GLOBAL_DMS : undefined}
-        >
-          {renderContent()}
-        </SlackAppShell>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <SlackAppShell
+            activeNavId={activeNavId}
+            onNavChange={handleNavChange}
+            showSidebar={showSidebar}
+            topViewMode={activeTopView}
+            activeChatId={activeChatId}
+            onChatChange={handleChatChange}
+            sidebarActiveDmId={activeNavId === "dms" ? activeDmId : undefined}
+            sidebarOnDmSelect={activeNavId === "dms" ? setActiveDmId : undefined}
+            sidebarOverrideDms={activeNavId === "dms" ? GENERIC_GLOBAL_DMS : undefined}
+          >
+            {renderContent()}
+          </SlackAppShell>
+        </div>
       )}
     </div>
   );

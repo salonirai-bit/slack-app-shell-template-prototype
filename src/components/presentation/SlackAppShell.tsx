@@ -175,7 +175,7 @@ export function SlackAppShell({
         >
           {/* ── Top header ── */}
           <div className="slack-app-header relative shrink-0 w-full z-[100]">
-            <AppHeader />
+            <AppHeader topViewMode={topViewMode} />
           </div>
 
           {/* ── Body ── */}
@@ -188,6 +188,7 @@ export function SlackAppShell({
               onPrimaryNavChange={onPrimaryNavChange}
               onNavChange={onNavChange}
               showDMBadge={showDMBadge}
+              topViewMode={topViewMode}
             />
 
             {showSidebar ? (

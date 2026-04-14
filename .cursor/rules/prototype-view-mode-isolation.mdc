@@ -1,0 +1,24 @@
+---
+description: Channel Manager vs Partner (and Admin) prototype tabs are isolated — scope every change to the correct topViewMode
+alwaysApply: true
+---
+
+# Prototype top tabs — independent surfaces
+
+The Home prototype has **Admin**, **Channel Manager**, and **Partner View** (`page.tsx`: `activeTopView`). Slack shell content uses `topViewMode` on `SlackAppShell`, `AppHeader`, `DemoSidebar`, `DemoIconBar`, and related views.
+
+## Rule
+
+- **Channel Manager** requests apply **only** when `topViewMode === "channel-manager"` (or the equivalent branch). Do **not** change Partner styling, copy, data, or behavior unless the user asks for Partner too.
+- **Partner View** requests apply **only** when `topViewMode === "seller"` (`partner-shell` / `partner-chrome`). Do **not** change Channel Manager unless explicitly requested.
+- **Admin** is the iframe path — separate from both Slack modes.
+
+## Implementation pattern
+
+- Prefer **explicit branches**: `topViewMode === "channel-manager" ? … : …`, `topViewMode === "seller" ? … : …`, or `cn(..., isPartnerView && …)`.
+- Avoid **shared defaults** that silently affect both tabs; if a default exists, document which tab it belongs to or split props per mode.
+- **Global CSS** (e.g. `.slack-app-header`) must not force one tab’s look onto the other — use wrapper classes/data attributes per mode if global rules are needed.
+
+## When the user specifies a tab
+
+If they say “in Channel Manager” or “on the Partner tab,” treat that as **hard scope**: gate the diff to that mode only and leave the other tab unchanged.

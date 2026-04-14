@@ -54,7 +54,8 @@ body,
   --shell-today-avatar-text: #404040;
   --shell-agenda-bar: #737373;
   --shell-files-nav-active: #262626;
-  --shell-dm-item-active: #262626;
+  /* DM row selected — mid gray on charcoal sidebar for readable contrast */
+  --shell-dm-item-active: #3d4046;
   --shell-file-dot: #737373;
   --shell-sidebar-accent-blue: #737373;
   --shell-badge-tonal-bg: #f5f5f5;
@@ -163,7 +164,7 @@ body.prototype-mode .arc-tooltip {
   z-index: 100 !important;
 }
 
-/* Ensure AppHeader component is never hidden */
+/* Ensure AppHeader component is never hidden (colors come from AppHeader utilities) */
 .slack-app-header header {
   display: flex !important;
   visibility: visible !important;

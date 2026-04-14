@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { mockDMs, mockChannels, mockActivity } from "@/lib/mock-data";
+import { assetPath } from "@/lib/asset-path";
 
 export interface DemoReaction {
   emoji: string;
@@ -212,7 +213,7 @@ const DM_PREVIEWS: Record<string, { preview: string; timestamp: string }> = {
     timestamp: "Today" 
   },
   "aisha-raman": {
-    preview: "Reviewed your Q1 planning deck. Looks strong — added 3 comments in the notes for the Acme risk section.",
+    preview: "Hey — welcome to PRM on Slack! I'm Aisha, your channel manager. Glad to have you in the workspace. How's it going so far?",
     timestamp: "Today"
   },
   "noah-kim": {
@@ -302,7 +303,7 @@ export function DemoDataProvider({ children }: { children: React.ReactNode }) {
   const isChannelRead = (channelId: string) => readChannelIds.has(channelId);
 
   useEffect(() => {
-    fetch("/demo-data.json")
+    fetch(assetPath("/demo-data.json"))
       .then((r) => {
         if (!r.ok) throw new Error(`Failed to load demo-data.json: ${r.status}`);
         return r.json();
@@ -316,7 +317,7 @@ export function DemoDataProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    fetch("/block-kit-messages.json")
+    fetch(assetPath("/block-kit-messages.json"))
       .then((r) => {
         if (!r.ok) throw new Error(`Failed to load block-kit-messages.json: ${r.status}`);
         return r.json();
