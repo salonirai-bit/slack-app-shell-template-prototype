@@ -1,16 +1,16 @@
 /** @type {import('next').NextConfig} */
 // GitHub Pages needs a subpath. Dev server must stay at `/` (basePath breaks `next dev`).
 //
-// • Default `npm run build`: assets use `/slack-app-shell-template-prototype/...`
-//   (must match the GitHub repo name for username.github.io/<repo>/ Pages).
-//   → `next start`: open http://localhost:3000/slack-app-shell-template-prototype
+// • Default `npm run build`: assets use `/slack-vision-partner-cloud/...`
+//   → `next start`: open http://localhost:3000/slack-vision-partner-cloud
+//   → static `out/`: serve so that URL path matches (or use build:local).
 // • Local static preview at site root: `npm run build:local` then `npm run preview:local`
 //   (sets BASE_PATH= so links are `/ _next/...`).
 const isDev = process.env.NODE_ENV === "development";
 const publishBasePath =
   process.env.BASE_PATH !== undefined
     ? String(process.env.BASE_PATH).trim() || ""
-    : "/slack-app-shell-template-prototype";
+    : "/slack-vision-partner-cloud";
 
 const nextConfig = {
     // Static export only for production `next build` (GitHub Pages / `out`).

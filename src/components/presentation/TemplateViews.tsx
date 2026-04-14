@@ -1730,16 +1730,11 @@ function MdfOutlineButton({ children }: { children: React.ReactNode }) {
   return (
     <button
       type="button"
-      className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-md text-[12px] font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+      className="inline-flex items-center justify-center px-3 py-1.5 rounded-md text-[13px] font-semibold bg-white text-gray-800 border border-gray-300 shadow-sm hover:bg-gray-50"
     >
       {children}
     </button>
   );
-}
-
-function mdfRequestStatusPillClass(status: "pending" | "approved") {
-  if (status === "pending") return "bg-amber-100 text-amber-900";
-  return "bg-emerald-100 text-emerald-800";
 }
 
 export function TemplatePartnerMdfView() {
@@ -1785,115 +1780,109 @@ export function TemplatePartnerMdfView() {
           </div>
         </div>
 
-        <div className="px-6 pb-8 min-h-0">
-          <h3 className="text-[18px] font-semibold text-gray-900 mb-3">Your MDF Requests</h3>
-          <table className="w-full text-left">
-            <thead className="sticky top-0 z-[1] bg-[#fafafa] border-b border-gray-200">
-              <tr className="text-[12px] text-gray-500">
-                <th className="px-6 py-3 font-semibold">Type</th>
-                <th className="px-4 py-3 font-semibold">Campaign Name</th>
-                <th className="px-4 py-3 font-semibold">Requested</th>
-                <th className="px-4 py-3 font-semibold">Submitted</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
-                <th className="px-4 py-3 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="px-6 py-3 align-middle">
-                  <Megaphone className="w-5 h-5 text-gray-500" strokeWidth={2} aria-hidden />
-                </td>
-                <td className="px-4 py-3 align-middle">
-                  <div className="text-[14px] font-semibold text-[#1f4f75]">Q3 Cybersecurity Webinar</div>
-                  <div className="text-[14px] text-gray-700 mt-0.5">Apex Solutions</div>
-                </td>
-                <td className="px-4 py-3 text-[14px] font-medium text-gray-900">$5,000</td>
-                <td className="px-4 py-3 text-[14px] text-gray-700">Oct 1, 2025</td>
-                <td className="px-4 py-3 align-middle">
-                  <span
-                    className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${mdfRequestStatusPillClass("pending")}`}
-                  >
-                    Pending Approval
-                  </span>
-                </td>
-                <td className="px-4 py-3 align-middle">
-                  <MdfOutlineButton>View Details</MdfOutlineButton>
-                </td>
-              </tr>
-              <tr className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="px-6 py-3 align-middle">
-                  <Megaphone className="w-5 h-5 text-gray-500" strokeWidth={2} aria-hidden />
-                </td>
-                <td className="px-4 py-3 align-middle">
-                  <div className="text-[14px] font-semibold text-[#1f4f75]">Partner Summit Sponsorship</div>
-                  <div className="text-[14px] text-gray-700 mt-0.5">Apex Solutions</div>
-                </td>
-                <td className="px-4 py-3 text-[14px] font-medium text-gray-900">$4,500</td>
-                <td className="px-4 py-3 text-[14px] text-gray-700">Sep 15, 2025</td>
-                <td className="px-4 py-3 align-middle">
-                  <span
-                    className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${mdfRequestStatusPillClass("approved")}`}
-                  >
-                    Approved
-                  </span>
-                </td>
-                <td className="px-4 py-3 align-middle">
-                  <div className="flex flex-wrap items-center gap-2">
+        <div className="px-6 pb-8">
+          <h3 className="text-[18px] font-semibold text-gray-900 mb-4">Your MDF Requests</h3>
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-100 border-b border-gray-200 text-[12px] text-gray-700">
+                  <th className="px-5 py-3 font-bold">Type</th>
+                  <th className="px-5 py-3 font-bold">Campaign Name</th>
+                  <th className="px-5 py-3 font-bold">Requested</th>
+                  <th className="px-5 py-3 font-bold">Submitted</th>
+                  <th className="px-5 py-3 font-bold">Status</th>
+                  <th className="px-5 py-3 font-bold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="text-[14px]">
+                <tr className="border-b border-gray-200">
+                  <td className="px-5 py-4 align-middle">
+                    <Megaphone className="w-5 h-5 text-gray-600" strokeWidth={2} aria-hidden />
+                  </td>
+                  <td className="px-5 py-4 align-middle">
+                    <div className="font-semibold text-gray-900">Q3 Cybersecurity Webinar</div>
+                    <div className="text-[13px] text-gray-500 mt-0.5">Apex Solutions</div>
+                  </td>
+                  <td className="px-5 py-4 align-middle text-gray-900">$5,000</td>
+                  <td className="px-5 py-4 align-middle text-gray-700">Oct 1, 2025</td>
+                  <td className="px-5 py-4 align-middle">
+                    <span className="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold bg-yellow-200 text-gray-900">
+                      Pending Approval
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 align-middle">
                     <MdfOutlineButton>View Details</MdfOutlineButton>
-                    <MdfOutlineButton>Submit POP</MdfOutlineButton>
-                  </div>
-                </td>
-              </tr>
-              <tr className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="px-6 py-3 align-middle">
-                  <Megaphone className="w-5 h-5 text-gray-500" strokeWidth={2} aria-hidden />
-                </td>
-                <td className="px-4 py-3 align-middle">
-                  <div className="text-[14px] font-semibold text-[#1f4f75]">Q4 Local Workshop Series</div>
-                  <div className="text-[14px] text-gray-700 mt-0.5">Apex Solutions</div>
-                </td>
-                <td className="px-4 py-3 text-[14px] font-medium text-gray-900">$4,000</td>
-                <td className="px-4 py-3 text-[14px] text-gray-700">Oct 10, 2025</td>
-                <td className="px-4 py-3 align-middle">
-                  <span
-                    className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${mdfRequestStatusPillClass("approved")}`}
-                  >
-                    Approved
-                  </span>
-                </td>
-                <td className="px-4 py-3 align-middle">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <MdfOutlineButton>View Details</MdfOutlineButton>
-                    <MdfOutlineButton>View POP</MdfOutlineButton>
-                  </div>
-                </td>
-              </tr>
-              <tr className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="px-6 py-3 align-middle">
-                  <Megaphone className="w-5 h-5 text-gray-500" strokeWidth={2} aria-hidden />
-                </td>
-                <td className="px-4 py-3 align-middle">
-                  <div className="text-[14px] font-semibold text-[#1f4f75]">Digital Ad Campaign</div>
-                  <div className="text-[14px] text-gray-700 mt-0.5">Apex Solutions</div>
-                </td>
-                <td className="px-4 py-3 text-[14px] font-medium text-gray-900">$5,500</td>
-                <td className="px-4 py-3 text-[14px] text-gray-700">Oct 5, 2025</td>
-                <td className="px-4 py-3 align-middle">
-                  <span
-                    className={`inline-flex px-2 py-0.5 rounded-md text-[12px] font-medium ${mdfRequestStatusPillClass("approved")}`}
-                  >
-                    Approved
-                  </span>
-                </td>
-                <td className="px-4 py-3 align-middle">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <MdfOutlineButton>View Details</MdfOutlineButton>
-                    <MdfOutlineButton>Submit POP</MdfOutlineButton>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="px-5 py-4 align-middle">
+                    <Megaphone className="w-5 h-5 text-gray-600" strokeWidth={2} aria-hidden />
+                  </td>
+                  <td className="px-5 py-4 align-middle">
+                    <div className="font-semibold text-gray-900">Partner Summit Sponsorship</div>
+                    <div className="text-[13px] text-gray-500 mt-0.5">Apex Solutions</div>
+                  </td>
+                  <td className="px-5 py-4 align-middle text-gray-900">$4,500</td>
+                  <td className="px-5 py-4 align-middle text-gray-700">Sep 15, 2025</td>
+                  <td className="px-5 py-4 align-middle">
+                    <span className="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold bg-green-600 text-white">
+                      Approved
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 align-middle">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <MdfOutlineButton>View Details</MdfOutlineButton>
+                      <MdfOutlineButton>Submit POP</MdfOutlineButton>
+                    </div>
+                  </td>
+                </tr>
+                <tr className="border-b border-gray-200">
+                  <td className="px-5 py-4 align-middle">
+                    <Megaphone className="w-5 h-5 text-gray-600" strokeWidth={2} aria-hidden />
+                  </td>
+                  <td className="px-5 py-4 align-middle">
+                    <div className="font-semibold text-gray-900">Q4 Local Workshop Series</div>
+                    <div className="text-[13px] text-gray-500 mt-0.5">Apex Solutions</div>
+                  </td>
+                  <td className="px-5 py-4 align-middle text-gray-900">$4,000</td>
+                  <td className="px-5 py-4 align-middle text-gray-700">Oct 10, 2025</td>
+                  <td className="px-5 py-4 align-middle">
+                    <span className="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold bg-green-600 text-white">
+                      Approved
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 align-middle">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <MdfOutlineButton>View Details</MdfOutlineButton>
+                      <MdfOutlineButton>View POP</MdfOutlineButton>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-5 py-4 align-middle">
+                    <Megaphone className="w-5 h-5 text-gray-600" strokeWidth={2} aria-hidden />
+                  </td>
+                  <td className="px-5 py-4 align-middle">
+                    <div className="font-semibold text-gray-900">Digital Ad Campaign</div>
+                    <div className="text-[13px] text-gray-500 mt-0.5">Apex Solutions</div>
+                  </td>
+                  <td className="px-5 py-4 align-middle text-gray-900">$5,500</td>
+                  <td className="px-5 py-4 align-middle text-gray-700">Oct 5, 2025</td>
+                  <td className="px-5 py-4 align-middle">
+                    <span className="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold bg-green-600 text-white">
+                      Approved
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 align-middle">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <MdfOutlineButton>View Details</MdfOutlineButton>
+                      <MdfOutlineButton>Submit POP</MdfOutlineButton>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

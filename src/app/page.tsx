@@ -17,7 +17,7 @@ import {
   TemplatePartnerMdfView,
   TemplatePartnerCampaignsView,
 } from "@/components/presentation/TemplateViews";
-import type { NavView, ChannelManagerWorkspaceId } from "@/app/(demo)/demo/workspace/[workspaceId]/_context/demo-layout-context";
+import type { NavView } from "@/app/(demo)/demo/workspace/[workspaceId]/_context/demo-layout-context";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_CHAT: Record<string, string> = {
@@ -32,8 +32,6 @@ export default function Home() {
   const [activeNavId, setActiveNavId] = useState<NavView>("today");
   const [activeDmId, setActiveDmId] = useState<string | undefined>(undefined);
   const [activeChatId, setActiveChatId] = useState<string>("");
-  const [channelManagerWorkspace, setChannelManagerWorkspace] =
-    useState<ChannelManagerWorkspaceId>("partner");
 
   const handleNavChange = useCallback((nav: NavView) => {
     setActiveNavId(nav);
@@ -56,7 +54,6 @@ export default function Home() {
           <SlackTodayView
             onNavigateToActivity={() => handleNavChange("activity")}
             topViewMode={activeTopView}
-            channelManagerWorkspace={channelManagerWorkspace}
           />
         );
       case "home":
@@ -192,8 +189,6 @@ export default function Home() {
             onNavChange={handleNavChange}
             showSidebar={showSidebar}
             topViewMode={activeTopView}
-            channelManagerWorkspaceId={channelManagerWorkspace}
-            onChannelManagerWorkspaceChange={setChannelManagerWorkspace}
             activeChatId={activeChatId}
             onChatChange={handleChatChange}
             sidebarActiveDmId={activeNavId === "dms" ? activeDmId : undefined}

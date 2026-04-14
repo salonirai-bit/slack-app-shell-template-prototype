@@ -29,9 +29,6 @@ const SlackbotContext = createContext<{
 
 export const useSlackbot = () => useContext(SlackbotContext);
 
-/** Channel Manager: partner portfolio (PRM/co-sell) vs company day-to-day Slack */
-export type ChannelManagerWorkspaceId = "partner" | "company";
-
 // Nav context for left icon bar
 export type NavView = "home" | "dms" | "activity" | "files" | "later" | "agentforce" | "more" | "today" | "sales";
 const NavContext = createContext<{
