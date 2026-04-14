@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 // GitHub Pages needs basePath; `output: 'export'` + basePath breaks `next dev` routing (404 on all pages).
-const publishBasePath = "/slack-app-shell-template-prototype";
+const publishBasePath = "/slack-vision-partner-cloud";
 const isDev = process.env.NODE_ENV === "development";
 
 const nextConfig = {

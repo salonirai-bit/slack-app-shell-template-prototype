@@ -1,6 +1,6 @@
-# Slack App Shell Boilerplate
+# Slack Vision — Partner Cloud
 
-A clean, reusable Slack App Shell template for designers to build new Slack integration concepts.
+A Slack-style prototype shell for **Partner Cloud** and **channel manager** experiences (forked from the Slack App Shell boilerplate).
 
 > **⚠️ This is a read-only template repository.** To make changes, please **fork** this repository and work in your own fork.
 
@@ -30,8 +30,8 @@ This is a **boilerplate template** that provides a fully functional Slack-like U
 
 **Step 2: Clone your fork**
 ```bash
-git clone https://git.soma.salesforce.com/YOUR-USERNAME/slack-app-shell-template.git
-cd slack-app-shell-template
+git clone https://github.com/YOUR-USERNAME/slack-vision-partner-cloud.git
+cd slack-vision-partner-cloud
 ```
 
 **Step 3: Install & Run**

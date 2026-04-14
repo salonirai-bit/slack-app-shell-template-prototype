@@ -20,8 +20,8 @@ const lato = Lato({
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 export const metadata: Metadata = {
-  title: "Slack App Shell",
-  description: "A reusable Slack App Shell boilerplate for designing new concepts.",
+  title: "Slack Vision — Partner Cloud",
+  description: "Slack Vision Partner Cloud prototype: channel manager and partner experiences in a Slack-style shell.",
   icons: {
     icon: `${basePath}/slackbot-logo.svg`,
   },
