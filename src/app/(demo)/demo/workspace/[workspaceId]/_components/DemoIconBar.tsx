@@ -13,7 +13,7 @@ import {
   IconMore,
   IconPlus,
 } from "@/components/icons";
-import { Sun, BarChart3, ChevronDown } from "lucide-react";
+import { Sun, BarChart3, ChevronDown, Handshake, Building2 } from "lucide-react";
 import {
   useDemoData,
   getAvatarUrl,
@@ -486,7 +486,7 @@ export function DemoIconBar({
                   <ChevronDown className="w-3 h-3 text-white/70 shrink-0" aria-hidden />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="start" sideOffset={10} className="w-72 z-[300]">
+              <DropdownMenuContent side="right" align="start" sideOffset={10} className="min-w-[14rem] z-[300]">
                 <DropdownMenuLabel className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">
                   Workspaces
                 </DropdownMenuLabel>
@@ -496,21 +496,19 @@ export function DemoIconBar({
                     onChannelManagerWorkspaceChange(v as ChannelManagerWorkspaceId)
                   }
                 >
-                  <DropdownMenuRadioItem value="partner" className="items-start py-2.5 cursor-pointer">
-                    <div className="flex flex-col gap-0.5 pr-2">
-                      <span className="font-semibold text-gray-900">Partner portfolio</span>
-                      <span className="text-[12px] font-normal text-gray-500 leading-snug">
-                        PRM, co-sell, MDF, and partner-sourced pipeline
-                      </span>
-                    </div>
+                  <DropdownMenuRadioItem
+                    value="partner"
+                    className="flex flex-row items-center gap-2.5 py-2 cursor-pointer"
+                  >
+                    <Handshake className="w-4 h-4 shrink-0 text-[#0176d3]" strokeWidth={2} aria-hidden />
+                    <span className="font-medium text-gray-900">Salesforce Partners</span>
                   </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="company" className="items-start py-2.5 cursor-pointer">
-                    <div className="flex flex-col gap-0.5 pr-2">
-                      <span className="font-semibold text-gray-900">Vibeface (company)</span>
-                      <span className="text-[12px] font-normal text-gray-500 leading-snug">
-                        Day-to-day Slack, deals, and internal team work
-                      </span>
-                    </div>
+                  <DropdownMenuRadioItem
+                    value="company"
+                    className="flex flex-row items-center gap-2.5 py-2 cursor-pointer"
+                  >
+                    <Building2 className="w-4 h-4 shrink-0 text-[#0176d3]" strokeWidth={2} aria-hidden />
+                    <span className="font-medium text-gray-900">Salesforce Internal</span>
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
