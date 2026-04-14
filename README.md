@@ -67,7 +67,7 @@ src/
 
 ## GitHub Pages
 
-Static export uses **`basePath` `/slack-vision-partner-cloud`** (`next.config.mjs`). For assets to load on GitHub Pages, your repository name should be **`slack-vision-partner-cloud`** (URL: `https://<user>.github.io/slack-vision-partner-cloud/`). If your repo slug differs, set `publishBasePath` in `next.config.mjs` to `/<repo-name>` and run `npm run build:pages`.
+Static export uses **`basePath` matching the GitHub repo name** (default **`/slack-app-shell-template-prototype`** in `next.config.mjs`). Pages URL: `https://<user>.github.io/slack-app-shell-template-prototype/`. Rename the repo or set `BASE_PATH=/<repo-slug> npm run build` if the slug changes.
 
 ## 🛠️ Tech Stack
 
