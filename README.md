@@ -65,6 +65,9 @@ src/
     └── DemoDataContext.tsx   # Mock data for channels, DMs, files
 ```
 
+## GitHub Pages
+
+Static export uses **`basePath` `/slack-vision-partner-cloud`** (`next.config.mjs`). For assets to load on GitHub Pages, your repository name should be **`slack-vision-partner-cloud`** (URL: `https://<user>.github.io/slack-vision-partner-cloud/`). If your repo slug differs, set `publishBasePath` in `next.config.mjs` to `/<repo-name>` and run `npm run build:pages`.
 
 ## 🛠️ Tech Stack
 
