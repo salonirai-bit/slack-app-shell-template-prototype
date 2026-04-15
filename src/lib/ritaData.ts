@@ -391,6 +391,82 @@ export const RITA_DATA = {
   },
 } as const;
 
+/** Today feed for Channel Manager · Salesforce Internal workspace only (non–partner-focused). */
+export const RITA_INTERNAL_CM_TODAY = {
+  date: RITA_DATA.today.date,
+  repliesNeeded: [
+    {
+      from: "Finance Ops",
+      channel: "#procurement",
+      preview:
+        "Q1 software true-up is due Friday. Please confirm headcount in your cost center so we can lock the Salesforce license pool.",
+      time: "8:40 AM",
+      initials: "FN",
+    },
+    {
+      from: "Internal Comms",
+      channel: "#all-company",
+      preview:
+        "Reminder: SKO registration opens Monday. Managers — please approve travel exceptions in Workday by EOD Wednesday.",
+      time: "Today",
+      initials: "IC",
+    },
+    {
+      from: "Alex Rivera",
+      channel: "#marketing-ops",
+      preview:
+        "Can you review the updated brand guidelines PDF before we publish to the wiki? Legal only left comments on slide 4.",
+      time: "Yesterday",
+      initials: "AR",
+    },
+  ],
+  highlights: [
+    {
+      channel: "#product-news",
+      summary:
+        "Agentforce 2.0 GA timeline confirmed for March. Enablement sessions start next week — calendar invites going out today.",
+      mentions: ["Product Marketing", "Enablement"],
+      time: "Today",
+      sentiment: "positive" as const,
+      reactions: [
+        { emoji: "🚀", count: 14 },
+        { emoji: "✅", count: 6 },
+      ],
+      replies: 9,
+    },
+    {
+      channel: "#people-team",
+      summary:
+        "New parental leave policy effective Feb 1. HR office hours tomorrow 11–12 PT in #people-questions.",
+      mentions: ["People Team"],
+      time: "Today",
+      sentiment: "positive" as const,
+      reactions: [{ emoji: "💙", count: 22 }],
+      replies: 5,
+    },
+    {
+      channel: "#it-status",
+      summary:
+        "VPN maintenance window Saturday 1–3am PT. No action needed unless you batch jobs overnight — see runbook link in thread.",
+      mentions: ["IT Service Desk"],
+      time: "Today",
+      sentiment: "warning" as const,
+      reactions: [{ emoji: "ℹ️", count: 4 }],
+      replies: 3,
+    },
+    {
+      channel: "#exec-staff",
+      summary:
+        "Board read-ahead due Jan 5. Please upload your one-pagers to the secure folder — no customer names in shared summaries.",
+      mentions: [],
+      time: "10:12 AM",
+      sentiment: "critical" as const,
+      reactions: [],
+      replies: 1,
+    },
+  ],
+} as const;
+
 // Health dot colors — consistent across all views
 export const HEALTH_COLORS = {
   "on-track":     { dot: "#22C55E", bg: "#F0FDF4", text: "#16A34A", label: "On Track" },

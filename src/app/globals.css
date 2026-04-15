@@ -36,14 +36,15 @@ body,
   --shell-checkbox-accent: #1f7bb6;
 }
 
-/* Partner View: neutrals only; whites / near-whites stay on components */
+/* Partner View: neutrals for chrome; primary actions use Slack green (same as default shell-cta) */
 .partner-chrome {
-  --shell-cta: #262626;
-  --shell-cta-hover: #404040;
+  --shell-cta: #007a5a;
+  --shell-cta-hover: #00684c;
   --shell-tab-active: #171717;
   --shell-mrkdwn-link: #525252;
-  --shell-block-primary-bg: #262626;
-  --shell-block-primary-hover: #404040;
+  /* Block Kit / primary actions — Slack green in Partner View */
+  --shell-block-primary-bg: #007a5a;
+  --shell-block-primary-hover: #00684c;
   --shell-overlay-icon-bg: #e8e8e8;
   --shell-today-tab: #171717;
   --shell-today-spinner: #404040;

@@ -108,6 +108,8 @@ export function SlackAppShell({
   const [isSlackbotOpen, setIsSlackbotOpen] = useState(forceSlackbotOpen);
   const [dealRegistrationPromptKey, setDealRegistrationPromptKey] = useState(0);
   const [dealRegistrationDeliveredKey, setDealRegistrationDeliveredKey] = useState(0);
+  const [mdfRequestPromptKey, setMdfRequestPromptKey] = useState(0);
+  const [mdfRequestDeliveredKey, setMdfRequestDeliveredKey] = useState(0);
 
   // Keep open-state in sync with the Concept's forceSlackbotOpen prop
   const prevForceRef = useRef(forceSlackbotOpen);
@@ -134,6 +136,16 @@ export function SlackAppShell({
     setDealRegistrationDeliveredKey((prev) => (key > prev ? key : prev));
   }, []);
 
+  const requestMdfRequestPrompt = useCallback(() => {
+    setIsSlackbotOpen(true);
+    onSlackbotToggle?.(true);
+    setMdfRequestPromptKey((k) => k + 1);
+  }, [onSlackbotToggle]);
+
+  const markMdfRequestPromptDelivered = useCallback((key: number) => {
+    setMdfRequestDeliveredKey((prev) => (key > prev ? key : prev));
+  }, []);
+
   // Resolve bot panel: concept-supplied content or default
   const botPanel = botPayload ?? (
     <SlackbotPanel
@@ -151,6 +163,10 @@ export function SlackAppShell({
           deliveredPromptKey: dealRegistrationDeliveredKey,
           markDealPromptDelivered,
           requestRegisterDealPrompt,
+          mdfRequestPromptKey,
+          mdfRequestDeliveredKey,
+          markMdfRequestPromptDelivered,
+          requestMdfRequestPrompt,
         }}
       >
       <DemoLayoutProviders

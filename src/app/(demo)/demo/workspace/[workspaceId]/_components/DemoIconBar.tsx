@@ -13,7 +13,7 @@ import {
   IconMore,
   IconPlus,
 } from "@/components/icons";
-import { Sun, BarChart3 } from "lucide-react";
+import { Sun, BarChart3, ChevronDown } from "lucide-react";
 import {
   useDemoData,
   getAvatarUrl,
@@ -26,6 +26,21 @@ import { useNav, usePresentationMode, useDemoContext, type NavView } from "../_c
 import { cn } from "@/lib/utils";
 import { SLACK_TOKENS } from "@/design/slack-tokens";
 import { assetPath } from "@/lib/asset-path";
+import {
+  useCmWorkspace,
+  CM_WORKSPACE_OPTIONS,
+  getCmWorkspaceLabel,
+  type CmWorkspaceId,
+} from "@/context/CmWorkspaceContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const T = SLACK_TOKENS;
 
@@ -401,6 +416,7 @@ export function DemoIconBar({
   const { demoContext } = useDemoContext();
 
   const { dms, files, savedItems, getChannelPreview } = useDemoData();
+  const { activeWorkspaceId, setActiveWorkspaceId } = useCmWorkspace();
 
   // Global icon bar: Always filter out Slackbot DM (Seller Edge is Arc 1 specific)
   const filteredDms = dms.filter((dm) => !dm.isSlackbot);
@@ -447,15 +463,73 @@ export function DemoIconBar({
           topViewMode === "seller" ? "bg-[#0a0a0a]" : "bg-[#4A154B]"
         )}
       >
-        {/* Logo */}
-        <div className="mb-4 flex items-center justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={assetPath("/Salesforce.png")}
-            alt="Salesforce"
-            className="w-8 h-8 object-contain"
-          />
-        </div>
+        {/* Logo — workspace switcher on CM / default rail; hidden on Partner (seller) rail */}
+        {topViewMode !== "seller" ? (
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="mb-4 flex flex-col items-center gap-0.5 rounded-lg px-1 py-0.5 outline-none ring-offset-2 ring-offset-[#4A154B] focus-visible:ring-2 focus-visible:ring-white/50 hover:bg-white/10 transition-colors cursor-pointer"
+                title="Switch workspace"
+                aria-label={`Workspace: ${getCmWorkspaceLabel(activeWorkspaceId)}. Switch workspace.`}
+                aria-haspopup="menu"
+              >
+                <div className="flex items-center gap-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={assetPath("/Salesforce.png")}
+                    alt=""
+                    className="w-8 h-8 object-contain pointer-events-none"
+                  />
+                  <ChevronDown
+                    className="w-3.5 h-3.5 text-white/90 shrink-0 -ml-0.5 pointer-events-none"
+                    strokeWidth={2.5}
+                    aria-hidden
+                  />
+                </div>
+                <span className="text-[8px] font-semibold text-white/85 text-center leading-tight max-w-[68px] truncate px-0.5 pointer-events-none">
+                  {getCmWorkspaceLabel(activeWorkspaceId)}
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-[260px] z-[200]"
+              align="start"
+              side="right"
+              sideOffset={10}
+              collisionPadding={12}
+            >
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                Switch workspace
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={activeWorkspaceId}
+                onValueChange={(v) => setActiveWorkspaceId(v as CmWorkspaceId)}
+              >
+                {CM_WORKSPACE_OPTIONS.map((w) => (
+                  <DropdownMenuRadioItem key={w.id} value={w.id} className="cursor-pointer">
+                    <div className="flex flex-col gap-0.5 py-0.5 pr-2">
+                      <span className="font-semibold text-[13px] leading-tight">{w.label}</span>
+                      <span className="text-[11px] text-muted-foreground font-normal leading-snug">
+                        {w.subtitle}
+                      </span>
+                    </div>
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="mb-4 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={assetPath("/Salesforce.png")}
+              alt="Salesforce"
+              className="w-8 h-8 object-contain"
+            />
+          </div>
+        )}
 
         {navItems.map((item) => {
           const Icon = item.icon;

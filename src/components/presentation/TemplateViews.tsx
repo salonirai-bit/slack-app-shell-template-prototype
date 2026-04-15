@@ -1738,6 +1738,8 @@ function MdfOutlineButton({ children }: { children: React.ReactNode }) {
 }
 
 export function TemplatePartnerMdfView() {
+  const { requestMdfRequestPrompt } = useDealRegistrationPrompt();
+
   return (
     <div className="h-full flex flex-col overflow-hidden bg-white">
       <header className="shrink-0 flex items-center justify-between px-6 py-3 border-b border-gray-200">
@@ -1747,6 +1749,7 @@ export function TemplatePartnerMdfView() {
         </div>
         <button
           type="button"
+          onClick={() => requestMdfRequestPrompt()}
           className="inline-flex items-center gap-1.5 shrink-0 px-3 py-2 rounded-md text-[13px] font-semibold bg-[var(--shell-cta)] text-white border border-[var(--shell-cta)] hover:bg-[var(--shell-cta-hover)] hover:border-[var(--shell-cta-hover)] shadow-sm"
         >
           <Plus className="w-4 h-4" strokeWidth={2.5} />
@@ -1805,11 +1808,7 @@ export function TemplatePartnerMdfView() {
                   </td>
                   <td className="px-5 py-4 align-middle text-gray-900">$5,000</td>
                   <td className="px-5 py-4 align-middle text-gray-700">Oct 1, 2025</td>
-                  <td className="px-5 py-4 align-middle">
-                    <span className="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold bg-yellow-200 text-gray-900">
-                      Pending Approval
-                    </span>
-                  </td>
+                  <td className="px-5 py-4 align-middle text-gray-900">Pending Approval</td>
                   <td className="px-5 py-4 align-middle">
                     <MdfOutlineButton>View Details</MdfOutlineButton>
                   </td>
@@ -1824,11 +1823,7 @@ export function TemplatePartnerMdfView() {
                   </td>
                   <td className="px-5 py-4 align-middle text-gray-900">$4,500</td>
                   <td className="px-5 py-4 align-middle text-gray-700">Sep 15, 2025</td>
-                  <td className="px-5 py-4 align-middle">
-                    <span className="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold bg-green-600 text-white">
-                      Approved
-                    </span>
-                  </td>
+                  <td className="px-5 py-4 align-middle text-gray-900">Approved</td>
                   <td className="px-5 py-4 align-middle">
                     <div className="flex flex-wrap items-center gap-2">
                       <MdfOutlineButton>View Details</MdfOutlineButton>
@@ -1846,11 +1841,7 @@ export function TemplatePartnerMdfView() {
                   </td>
                   <td className="px-5 py-4 align-middle text-gray-900">$4,000</td>
                   <td className="px-5 py-4 align-middle text-gray-700">Oct 10, 2025</td>
-                  <td className="px-5 py-4 align-middle">
-                    <span className="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold bg-green-600 text-white">
-                      Approved
-                    </span>
-                  </td>
+                  <td className="px-5 py-4 align-middle text-gray-900">Approved</td>
                   <td className="px-5 py-4 align-middle">
                     <div className="flex flex-wrap items-center gap-2">
                       <MdfOutlineButton>View Details</MdfOutlineButton>
@@ -1868,11 +1859,7 @@ export function TemplatePartnerMdfView() {
                   </td>
                   <td className="px-5 py-4 align-middle text-gray-900">$5,500</td>
                   <td className="px-5 py-4 align-middle text-gray-700">Oct 5, 2025</td>
-                  <td className="px-5 py-4 align-middle">
-                    <span className="inline-flex px-2.5 py-1 rounded-full text-[12px] font-semibold bg-green-600 text-white">
-                      Approved
-                    </span>
-                  </td>
+                  <td className="px-5 py-4 align-middle text-gray-900">Approved</td>
                   <td className="px-5 py-4 align-middle">
                     <div className="flex flex-wrap items-center gap-2">
                       <MdfOutlineButton>View Details</MdfOutlineButton>

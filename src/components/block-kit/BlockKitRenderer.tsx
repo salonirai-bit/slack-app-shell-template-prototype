@@ -247,7 +247,7 @@ function Block({ block, onAction }: { block: SlackBlock; onAction?: (actionId: s
         content.push(
           <div
             key="text"
-            className={`text-[15px] mb-2 ${isWarning ? 'bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg' : ''}`}
+            className={`text-[15px] mb-2 whitespace-pre-line ${isWarning ? 'bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg' : ''}`}
             style={{ 
               color: isWarning ? '#92400e' : T.colors.text, 
               lineHeight: T.typography.bodyLineHeight 

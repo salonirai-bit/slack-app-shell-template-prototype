@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   IconStar,
   IconPencil,
@@ -13,6 +13,7 @@ import { MessageInput } from "@/components/shared/MessageInput";
 import { cn } from "@/lib/utils";
 import { SLACK_TOKENS } from "@/design/slack-tokens";
 import { assetPath } from "@/lib/asset-path";
+import { useDealRegistrationPrompt } from "@/context/DealRegistrationPromptContext";
 
 const T = SLACK_TOKENS;
 
@@ -36,7 +37,23 @@ interface SlackbotPanelProps {
 export function SlackbotPanel({ onClose, panelData, history = [], onUpdateHistory }: SlackbotPanelProps) {
   // Always default to Messages - generic 3-tab panel
   const [activeTab, setActiveTab] = useState<TabId>("messages");
-  
+  const { promptKey: dealRegistrationPromptKey, mdfRequestPromptKey } = useDealRegistrationPrompt();
+  const prevAutomationKeysRef = useRef({ deal: 0, mdf: 0 });
+
+  useEffect(() => {
+    const prev = prevAutomationKeysRef.current;
+    if (
+      dealRegistrationPromptKey > prev.deal ||
+      mdfRequestPromptKey > prev.mdf
+    ) {
+      setActiveTab("messages");
+    }
+    prevAutomationKeysRef.current = {
+      deal: dealRegistrationPromptKey,
+      mdf: mdfRequestPromptKey,
+    };
+  }, [dealRegistrationPromptKey, mdfRequestPromptKey]);
+
   // Ref to store sendMessage function from SlackbotMessagesTab
   const messagesTabSendRef = useRef<((message: string) => void) | null>(null);
 

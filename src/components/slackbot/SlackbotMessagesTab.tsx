@@ -14,6 +14,20 @@ import { SLACK_TOKENS } from "@/design/slack-tokens";
 import { ChatMessage as GlobalChatMessage } from "@/components/shared/ChatMessage";
 import { assetPath } from "@/lib/asset-path";
 import { useDealRegistrationPrompt } from "@/context/DealRegistrationPromptContext";
+import {
+  buildDealRegistrationAskMoreBlocks,
+  buildDealRegistrationJourneyBlocks,
+  buildDealRegistrationSubmittedBlocks,
+  computeDealRegistrationGaps,
+  dealRegistrationCompletenessPct,
+  fieldsFromSnippets,
+} from "@/lib/dealRegistrationJourney";
+import {
+  buildMdfRecommendationBlocks,
+  buildMdfSubmittedBlocks,
+  MDF_RECOMMENDATION_SUMMARY,
+  MDF_SUBMITTED_SUMMARY,
+} from "@/lib/mdfRequestJourney";
 
 const T = SLACK_TOKENS;
 
@@ -205,14 +219,26 @@ interface ChatMessage {
 const USER_AVATAR = "https://randomuser.me/api/portraits/med/women/90.jpg";
 const SLACKBOT_AVATAR = assetPath("/slackbot-logo.svg");
 
-const DEAL_REGISTRATION_PROMPT_TEXT =
-  "Let's register this new deal. Please share everything you have: account or company name, deal name, amount or range, stage, expected close date, partner involved, champion or stakeholders, and any other context (competition, risks, next steps). I'll turn it into a clean summary you can submit.";
+/** Plain fallback when history is serialized; main UI uses `DEAL_REGISTRATION_PROMPT_BLOCKS`. */
+const DEAL_REGISTRATION_PROMPT_SUMMARY =
+  "Register a deal: share what you know in a message, or attach documents for the registration.";
 
-const DEAL_REGISTERED_CHANNEL_MANAGER_TEXT =
-  "Your deal registration has been sent to the channel manager. They'll review what we captured and follow up in Slack if anything's missing.";
+const DEAL_REGISTRATION_PROMPT_BLOCKS: SlackBlock[] = [
+  {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text:
+        "*Let's register this deal*\n\n" +
+        "• *Tell me in your own words* — account, deal name, amount, stage, close date, partner, stakeholders, risks, next steps… whatever you have.\n" +
+        "• *Or upload files* — SOWs, briefs, notes, spreadsheets; anything that should live on the registration.\n\n" +
+        "_I'll organize it into a clean summary you can review and submit._",
+    },
+  },
+];
 
-const DEAL_REGISTRATION_ASK_MORE_TEXT =
-  "Sure — what else should I include? Account, amount, stage, dates, partner, stakeholders, or risks all help.";
+const DEAL_REGISTERED_SUMMARY =
+  "Deal registration submitted to your channel manager.";
 
 type DealRegFlow =
   | { kind: "idle" }
@@ -222,6 +248,8 @@ type DealRegFlow =
       /** True after we’ve shown the running summary and asked “more or ready?” */
       awaitingDecision: boolean;
     };
+
+type MdfRequestFlow = { kind: "idle" } | { kind: "awaiting_submit" };
 
 function wantsToSubmit(text: string): boolean {
   const t = text.toLowerCase().trim();
@@ -240,13 +268,8 @@ function wantsMoreOnly(text: string): boolean {
   return /^(more|add more|not yet|keep going|more details|another detail|i have more)[\s!.?]*$/i.test(t);
 }
 
-function buildDealSummaryReply(snippets: string[]): string {
-  const body =
-    snippets.length === 0
-      ? "(Nothing captured yet — add something about the account, amount, or stage.)"
-      : snippets.map((s, i) => `${i + 1}. ${s}`).join("\n");
-
-  return `Here's what I've captured for the new deal:\n\n${body}\n\nWant to add more, or are you ready to register this deal? Reply \"more\" to keep going, or \"ready\" / \"submit\" when you're done.`;
+function dealRegDraftSummary(snippets: string[], completeness: number): string {
+  return `Deal registration draft (${completeness}% parsed) · ${snippets.length} note${snippets.length === 1 ? "" : "s"}`;
 }
 
 interface SlackbotMessagesTabProps {
@@ -260,6 +283,9 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
     promptKey: dealRegistrationPromptKey,
     deliveredPromptKey: dealRegistrationDeliveredKey,
     markDealPromptDelivered,
+    mdfRequestPromptKey,
+    mdfRequestDeliveredKey,
+    markMdfRequestPromptDelivered,
   } = useDealRegistrationPrompt();
   const [messages, setMessages] = useState<ChatMessage[]>(history);
   const [isTyping, setIsTyping] = useState(false);
@@ -267,7 +293,9 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
   const historyLengthRef = useRef<number>(history.length);
   /** Prevents duplicate appends when Strict Mode runs the effect twice before `deliveredPromptKey` updates. */
   const lastAppendedDealRegistrationKeyRef = useRef(0);
+  const lastAppendedMdfRequestKeyRef = useRef(0);
   const dealRegFlowRef = useRef<DealRegFlow>({ kind: "idle" });
+  const mdfFlowRef = useRef<MdfRequestFlow>({ kind: "idle" });
   const botReplyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync local messages with history prop when it changes externally (only if actually different)
@@ -309,10 +337,13 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
     if (lastAppendedDealRegistrationKeyRef.current === dealRegistrationPromptKey) return;
     lastAppendedDealRegistrationKeyRef.current = dealRegistrationPromptKey;
 
+    mdfFlowRef.current = { kind: "idle" };
+
     const botMsg: ChatMessage = {
       id: `deal-reg-${dealRegistrationPromptKey}-${Date.now()}`,
       role: "bot",
-      content: DEAL_REGISTRATION_PROMPT_TEXT,
+      content: DEAL_REGISTRATION_PROMPT_SUMMARY,
+      blocks: DEAL_REGISTRATION_PROMPT_BLOCKS,
       timestamp: new Date(),
     };
     setMessages((prev) => {
@@ -330,6 +361,35 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
     dealRegistrationPromptKey,
     dealRegistrationDeliveredKey,
     markDealPromptDelivered,
+    onUpdateHistory,
+  ]);
+
+  useEffect(() => {
+    if (mdfRequestPromptKey <= 0) return;
+    if (mdfRequestPromptKey <= mdfRequestDeliveredKey) return;
+    if (lastAppendedMdfRequestKeyRef.current === mdfRequestPromptKey) return;
+    lastAppendedMdfRequestKeyRef.current = mdfRequestPromptKey;
+
+    dealRegFlowRef.current = { kind: "idle" };
+
+    const botMsg: ChatMessage = {
+      id: `mdf-req-${mdfRequestPromptKey}-${Date.now()}`,
+      role: "bot",
+      content: MDF_RECOMMENDATION_SUMMARY,
+      blocks: buildMdfRecommendationBlocks(),
+      timestamp: new Date(),
+    };
+    setMessages((prev) => {
+      const next = [...prev, botMsg];
+      onUpdateHistory?.(next);
+      return next;
+    });
+    mdfFlowRef.current = { kind: "awaiting_submit" };
+    markMdfRequestPromptDelivered(mdfRequestPromptKey);
+  }, [
+    mdfRequestPromptKey,
+    mdfRequestDeliveredKey,
+    markMdfRequestPromptDelivered,
     onUpdateHistory,
   ]);
 
@@ -357,35 +417,89 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
 
     setIsTyping(true);
 
-    const flow = dealRegFlowRef.current;
     let botPayload: { content?: string; blocks?: SlackBlock[] };
+
+    if (mdfFlowRef.current.kind === "awaiting_submit") {
+      if (wantsToSubmit(trimmed)) {
+        mdfFlowRef.current = { kind: "idle" };
+        botPayload = {
+          content: MDF_SUBMITTED_SUMMARY,
+          blocks: buildMdfSubmittedBlocks(),
+        };
+      } else {
+        const safeNote = trimmed.replace(/\*/g, "∗");
+        botPayload = {
+          content: "Note added to MDF draft — reply submit when ready.",
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text:
+                  `_*Your note:* ${safeNote}_\n\n` +
+                  "Reply *submit*, *send*, or *yes* when you want the recommended *Q1 Security Roadshow* ($6,500) raised to marketing ops.",
+              },
+            },
+          ],
+        };
+      }
+    } else {
+    const flow = dealRegFlowRef.current;
 
     if (flow.kind === "active") {
       const f = flow;
       if (f.awaitingDecision) {
         if (wantsToSubmit(trimmed)) {
           dealRegFlowRef.current = { kind: "idle" };
-          botPayload = { content: DEAL_REGISTERED_CHANNEL_MANAGER_TEXT };
+          botPayload = {
+            content: DEAL_REGISTERED_SUMMARY,
+            blocks: buildDealRegistrationSubmittedBlocks(),
+          };
         } else if (wantsMoreOnly(trimmed)) {
           dealRegFlowRef.current = { ...f, awaitingDecision: false };
-          botPayload = { content: DEAL_REGISTRATION_ASK_MORE_TEXT };
+          botPayload = {
+            content: "Add more deal details or say when you're ready to submit.",
+            blocks: buildDealRegistrationAskMoreBlocks(),
+          };
         } else {
           const snippets = [...f.snippets, trimmed];
+          const fields = fieldsFromSnippets(snippets);
+          const gaps = computeDealRegistrationGaps(fields);
+          const completeness = dealRegistrationCompletenessPct(fields);
           dealRegFlowRef.current = { ...f, snippets, awaitingDecision: true };
-          botPayload = { content: buildDealSummaryReply(snippets) };
+          botPayload = {
+            content: dealRegDraftSummary(snippets, completeness),
+            blocks: buildDealRegistrationJourneyBlocks(snippets, fields, gaps),
+          };
         }
       } else if (f.snippets.length === 0 && wantsToSubmit(trimmed)) {
         botPayload = {
-          content:
-            "I don't have any deal details yet. Add a line or two (company, amount, stage, close date, partner…), then say when you're ready to register.",
+          content: "Need at least a few deal details before you can submit.",
+          blocks: [
+            {
+              type: "section",
+              text: {
+                type: "mrkdwn",
+                text:
+                  "*Share a few details first*\n\nI don’t have anything to register yet. Send a short message with what you know (company, amount, stage, close date, partner, people) *or* mention files you’re attaching.\n\nThen I’ll build your draft for review.",
+              },
+            },
+          ],
         };
       } else {
         const snippets = [...f.snippets, trimmed];
+        const fields = fieldsFromSnippets(snippets);
+        const gaps = computeDealRegistrationGaps(fields);
+        const completeness = dealRegistrationCompletenessPct(fields);
         dealRegFlowRef.current = { ...f, snippets, awaitingDecision: true };
-        botPayload = { content: buildDealSummaryReply(snippets) };
+        botPayload = {
+          content: dealRegDraftSummary(snippets, completeness),
+          blocks: buildDealRegistrationJourneyBlocks(snippets, fields, gaps),
+        };
       }
     } else {
       botPayload = { blocks: getResponseBlocks(trimmed) };
+    }
     }
 
     botReplyTimeoutRef.current = setTimeout(() => {
@@ -456,7 +570,6 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
         )}
         {messages.map((m) => {
           const isUser = m.role === "user";
-          const fallbackText = m.content || "Shared a structured update";
           return (
             <GlobalChatMessage
               key={m.id}
@@ -465,7 +578,7 @@ export function SlackbotMessagesTab({ history = [], onUpdateHistory, onSendMessa
                 name: isUser ? "You" : "Slackbot",
                 avatar: isUser ? USER_AVATAR : SLACKBOT_AVATAR,
                 time: isUser ? "Just now" : "Just now",
-                text: fallbackText,
+                text: m.blocks ? undefined : m.content || "Shared a structured update",
                 blocks: m.blocks,
               }}
             />

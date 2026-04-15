@@ -11,6 +11,12 @@ export type DealRegistrationPromptContextValue = {
   markDealPromptDelivered: (key: number) => void;
   /** Opens the Slackbot panel and bumps `promptKey` so Messages can append the bot prompt. */
   requestRegisterDealPrompt: () => void;
+
+  /** PRM “New MDF Request” — opens Slackbot with a recommended MDF draft. */
+  mdfRequestPromptKey: number;
+  mdfRequestDeliveredKey: number;
+  markMdfRequestPromptDelivered: (key: number) => void;
+  requestMdfRequestPrompt: () => void;
 };
 
 const DealRegistrationPromptContext = createContext<DealRegistrationPromptContextValue>({
@@ -18,6 +24,10 @@ const DealRegistrationPromptContext = createContext<DealRegistrationPromptContex
   deliveredPromptKey: 0,
   markDealPromptDelivered: () => {},
   requestRegisterDealPrompt: () => {},
+  mdfRequestPromptKey: 0,
+  mdfRequestDeliveredKey: 0,
+  markMdfRequestPromptDelivered: () => {},
+  requestMdfRequestPrompt: () => {},
 });
 
 export function DealRegistrationPromptProvider({

@@ -1,8 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { mockDMs, mockChannels, mockActivity } from "@/lib/mock-data";
 import { assetPath } from "@/lib/asset-path";
+import { useCmWorkspace, type CmWorkspaceId } from "@/context/CmWorkspaceContext";
+
+function deepCloneMessageMap(
+  src: Record<string, DemoMessage[]>
+): Record<string, DemoMessage[]> {
+  try {
+    return structuredClone(src);
+  } catch {
+    return JSON.parse(JSON.stringify(src)) as Record<string, DemoMessage[]>;
+  }
+}
+
 
 export interface DemoReaction {
   emoji: string;
@@ -286,21 +298,50 @@ interface DemoDataContextValue {
 const DemoDataContext = createContext<DemoDataContextValue | null>(null);
 
 export function DemoDataProvider({ children }: { children: React.ReactNode }) {
-  const [messages, setMessages] = useState<Record<string, DemoMessage[]>>({});
+  const { activeWorkspaceId } = useCmWorkspace();
+
+  /** Isolated per CM workspace — same seed data, diverges after edits (e.g. mark read). */
+  const [messagesByWorkspace, setMessagesByWorkspace] = useState<Record<
+    CmWorkspaceId,
+    Record<string, DemoMessage[]>
+  > | null>(null);
+  const [readByWorkspace, setReadByWorkspace] = useState<
+    Record<CmWorkspaceId, Set<string>>
+  >(() => ({
+    "salesforce-partners": new Set(),
+    "salesforce-internal": new Set(),
+  }));
+
   const [demoData, setDemoData] = useState<Record<string, unknown> | null>(null);
   const [blockKitMessages, setBlockKitMessages] = useState<Record<string, unknown> | null>(null);
-  const [readChannelIds, setReadChannelIds] = useState<Set<string>>(() => new Set());
 
-  const markChannelAsRead = (channelId: string) => {
-    setReadChannelIds((prev) => {
-      if (prev.has(channelId)) return prev;
-      const next = new Set(prev);
-      next.add(channelId);
-      return next;
-    });
-  };
+  const messages = useMemo(
+    () => messagesByWorkspace?.[activeWorkspaceId] ?? {},
+    [messagesByWorkspace, activeWorkspaceId]
+  );
 
-  const isChannelRead = (channelId: string) => readChannelIds.has(channelId);
+  const readChannelIds = useMemo(
+    () => readByWorkspace[activeWorkspaceId],
+    [readByWorkspace, activeWorkspaceId]
+  );
+
+  const markChannelAsRead = useCallback(
+    (channelId: string) => {
+      setReadByWorkspace((prev) => {
+        const cur = prev[activeWorkspaceId];
+        if (cur.has(channelId)) return prev;
+        const nextSet = new Set(cur);
+        nextSet.add(channelId);
+        return { ...prev, [activeWorkspaceId]: nextSet };
+      });
+    },
+    [activeWorkspaceId]
+  );
+
+  const isChannelRead = useCallback(
+    (channelId: string) => readByWorkspace[activeWorkspaceId].has(channelId),
+    [readByWorkspace, activeWorkspaceId]
+  );
 
   useEffect(() => {
     fetch(assetPath("/demo-data.json"))
@@ -358,18 +399,27 @@ export function DemoDataProvider({ children }: { children: React.ReactNode }) {
               }
             });
           });
-          setMessages(enrichedMessages);
+          setMessagesByWorkspace({
+            "salesforce-partners": deepCloneMessageMap(enrichedMessages),
+            "salesforce-internal": deepCloneMessageMap(enrichedMessages),
+          });
         } catch (err) {
           console.error("Error processing messages:", err);
           // Fallback to unenriched messages if enrichment fails
           const channelMessages = (data?.channel_messages as Record<string, DemoMessage[]>) || {};
-          setMessages(channelMessages);
+          setMessagesByWorkspace({
+            "salesforce-partners": deepCloneMessageMap(channelMessages),
+            "salesforce-internal": deepCloneMessageMap(channelMessages),
+          });
         }
       })
       .catch((err) => {
         console.error("Failed to load block-kit-messages.json:", err);
         // Set empty object to prevent infinite loading state
-        setMessages({});
+        setMessagesByWorkspace({
+          "salesforce-partners": {},
+          "salesforce-internal": {},
+        });
         setBlockKitMessages({});
       });
   }, []);
